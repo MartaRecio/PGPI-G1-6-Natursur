@@ -1,0 +1,26 @@
+# Django
+*.pyc
+*__pycache__/
+db.sqlite3
+migrations/
+
+# Entorno virtual
+.venv/
+venv/
+.env/
+env/
+
+# VS Code
+.vscode/
+
+# Python
+*.pyo
+*.pyd
+.Python
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Archivos Django estáticos
+staticfiles/
