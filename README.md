@@ -34,7 +34,8 @@ Proyecto web para Natursur desarrollado en Django
 2. Desarrollar la feature
 3. Hacer commits descriptivos (titulo corto pero claro)
 4. Subir cambios de la rama: `git push -u origin feature/nombre`
-5. Fusionar con `main` después de aprobarse: `git checkout main`  --  `git merge feature/nombre-feature`
+5. Crear Pull Request para revisión (en GitHub)
+6. Fusionar con `main` después de aprobarse: `git checkout main`  --  `git merge feature/nombre-feature`
 
 
 ## 👥 Equipo
