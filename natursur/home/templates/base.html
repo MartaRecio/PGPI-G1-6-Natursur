@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Natursur | Sostenibilidad y Bienestar{% endblock %}</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Paleta de Colores Natursur - AJUSTADO AL DISEÑO DEL HEADER */
+        :root {
+            --color-corporate-green: #3D9140; /* Verde más vivo */
+            --color-light-background: #F7F5F0; 
+            --color-button-turquesa: #00A69A; /* Color del botón "RESERVA TU CITA" */
+            --color-text-dark: #333333;
+        }
+        .bg-button-turquesa { background-color: var(--color-button-turquesa); }
+        .text-corporate-green { color: var(--color-corporate-green); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--color-text-dark);
+            background-color: var(--color-light-background);
+        }
+        .nav-link {
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            color: #555;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: var(--color-button-turquesa);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- HEADER & NAVEGACIÓN - REPLICANDO LA ESTRUCTURA DE 3 COLUMNAS -->
+    <header class="shadow-sm sticky top-0 z-50 bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-24">
+            
+            <!-- COLUMNA 1: LOGO  -->
+            <div class="w-1/3 flex items-center">
+                <a href="{% url 'home' %}" class="flex items-center">
+                    <!-- 
+                        IMPORTANTE: 
+                        Para que esta imagen funcione, debe:
+                        Estar en: home/static/home/img/logo_natursur.png
+                    -->
+                    <img src="{% static 'home/img/logo_natursur.png' %}"
+                         alt="Natursur Logo Completo" 
+                         class="h-16 w-auto">
+                </a>
+            </div>
+
+            <!-- COLUMNA 2: MENÚ DE NAVEGACIÓN  -->
+            <nav class="hidden lg:flex w-1/3 justify-center items-center text-sm font-semibold uppercase">
+                <!-- Enlaces del menú principal -->
+                <a href="{% url 'home' %}" class="nav-link mx-4">Inicio</a>
+                <a href="#" class="nav-link mx-4">Servicios</a>
+                <a href="#" class="nav-link mx-4">Contacto</a>
+            </nav>
+
+            <!-- COLUMNA 3: BOTÓN DE ACCIÓN (33% de ancho, alineado a la derecha) -->
+            <div class="w-1/3 flex justify-end items-center">
+                <!-- Botón de Reserva que lleva a Calendly (Turquesa) -->
+                <a href="https://calendly.com/natursur/fernando-escalona" 
+                   target="_blank" 
+                   class="px-6 py-3 bg-button-turquesa text-white font-bold text-sm rounded-lg shadow-lg hover:bg-opacity-90 transition duration-200 uppercase whitespace-nowrap">
+                    Reserva tu cita
+                </a>
+
+                <!-- Botón de Menú (Mobile) -->
+                <button id="mobile-menu-button" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition duration-300 text-corporate-green ml-4">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Menú Móvil Desplegable -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white text-center shadow-inner">
+            <a href="{% url 'home' %}" class="block py-3 border-t hover:bg-gray-50">INICIO</a>
+            <a href="#" class="block py-3 border-t hover:bg-gray-50">SERVICIOS</a>
+            <a href="#" class="block py-3 border-t hover:bg-gray-50">CONTACTO</a>
+            <a href="https://calendly.com/natursur/fernando-escalona" target="_blank" class="block py-3 border-t hover:bg-gray-50 bg-button-turquesa text-white font-bold">RESERVA TU CITA</a>
+        </div>
+    </header>
+
+    <!-- BLOQUE DE CONTENIDO ÚNICO -->
+    <main class="flex-grow">
+        {% comment %} Bloque para mostrar mensajes de Django (éxito, error, etc.) {% endcomment %}
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 mt-4">
+            {% for message in messages %}
+            <div class="p-4 rounded-lg text-sm mb-3 
+                        {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-300
+                        {% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-300
+                        {% else %}bg-blue-100 text-blue-800 border border-blue-300{% endif %}" 
+                 role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% block content %}
+        {% endblock content %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-white pt-12 pb-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-xl font-bold mb-4 text-corporate-green">NATURSUR</h3>
+                <p class="text-gray-400 text-sm">Cuerpo, mente y alimentación: cuando los tres están en equilibrio, todo cambia".</p>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4 border-b border-corporate-green pb-2">Mapa Web</h4>
+                <ul class="space-y-2 text-sm text-gray-400">
+                    <li><a href="{% url 'home' %}" class="hover:text-corporate-green transition duration-300">Inicio</a></li>
+                    <li><a href="#" class="hover:text-corporate-green transition duration-300">Servicios</a></li>
+                    <li><a href="#" class="hover:text-corporate-green transition duration-300">Contacto</a></li>
+
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4 border-b border-corporate-green pb-2">Contacto</h4>
+                <p class="text-sm text-gray-400">
+                    Av. Santa Lucía, 6241500 Alcalá de Guadaíra, Sevilla
+                    <span class="block mt-2">Tel: <a href="tel:+34123456789" class="hover:text-corporate-green">+34 691 355 682</a></span>
+                    <span class="block">Email: <a href="mailto:info@natursur.com" class="hover:text-corporate-green">info@natursur.com</a></span>
+                </p>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4 border-b border-corporate-green pb-2">Síguenos</h4>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-corporate-green transition duration-300">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.24 12c0-5.52-4.48-10-10-10S2.24 6.48 2.24 12c0 4.93 3.63 9.07 8.35 9.8v-7H8.38v-2.8h2.21v-2.14c0-2.18 1.33-3.37 3.27-3.37 0.93 0 1.73 0.07 1.96 0.1v2.23h-1.32c-1.03 0-1.24 0.49-1.24 1.21V12h2.5L16.5 14.8h-2.1v7c4.72-0.73 8.35-4.87 8.35-9.8z"/></svg>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 border-t border-gray-700 mt-8 pt-4 text-center">
+            <p class="text-xs text-gray-500">&copy; 2025 Natursur. Desarrollado para PGPI-G1-6. | <a href="#" class="hover:text-white">Aviso Legal</a></p>
+        </div>
+    </footer>
+
+    <!-- JS para la funcionalidad del Menú Móvil -->
+    <script>
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
