@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Inicio - Natursur{% endblock %}
+
+
+{% block content %}
+    
+    <!-- SECCIÓN HERO (Primer bloque visual de la página de inicio) -->
+    <section class="relative bg-white pt-16 pb-20 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center">
+            
+            <!-- Texto y Llamada a la Acción (Izquierda) -->
+            <div class="lg:w-1/2 text-center lg:text-left mb-10 lg:mb-0">
+                <h1 class="mt-4 text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">
+                    El bienestar es una decisión,<br><span class="text-button-turquesa italic drop-shadow-lg">y empieza hoy</span>
+                </h1>
+                <p class="mt-4 text-lg text-gray-500 max-w-lg mx-auto lg:mx-0">
+                    Tu bienestar es una decisión que puedes tomar hoy. Con más de 25 años de experiencia, te ayudo a alcanzar un equilibrio entre cuerpo, mente y alimentación, para que vivas mejor, con energía y sin limitaciones.
+                </p>
+                <div class="mt-8 flex justify-center lg:justify-start space-x-4">
+                    <a href="https://calendly.com/natursur/fernando-escalona" target="_blank" class="px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-button-turquesa hover:bg-opacity-90 md:py-4 md:text-lg md:px-10 shadow-xl transition duration-300">
+                        RESERVA TU SESIÓN AHORA
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Imagen Placeholder (Derecha) -->
+            <div class="lg:w-1/2">
+                <div class="w-full h-80 md:h-96 rounded-xl shadow-2xl overflow-hidden group">
+                    <img src="{% static 'home/img/Fernando_Principal.png' %}"
+                        alt="Fernando - Especialista en bienestar"
+                        class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- SECCIÓN DE VALORES / SERVICIOS DESTACADOS (Ejemplo de contenido) -->
+    <section class="py-16 bg-light-background">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-extrabold text-center text-gray-900 mb-12">
+                Nuestros Pilares
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Tarjeta 1: Masaje -->
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02]">
+                    <div class="text-4xl text-center text-button-turquesa mb-4">🧘</div>
+                    <h3 class="text-xl text-center font-bold text-gray-900 mb-2">Terapias de Masaje</h3>
+                    <p class="text-gray-600 text-center text-sm">Alivia el dolor, reduce el estrés y restablece la energía de tu cuerpo con nuestras técnicas especializadas.</p>
+                </div>
+                <!-- Tarjeta 2: Nutrición -->
+                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:scale-[1.02]">
+                    <div class="text-4xl text-center text-corporate-green mb-4">🍏</div>
+                    <h3 class="text-xl text-center font-bold text-gray-900 mb-2">Nutrición y Equilibrio</h3>
+                    <p class="text-gray-600 text-center text-sm">Asesoramiento personalizado de nutrición para ayudarte a alcanzar tus objetivos de salud y bienestar.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock content %}
