@@ -17,6 +17,8 @@ Proyecto web para Natursur desarrollado en Django
 3. Activar entorno: `.\.venv\Scripts\activate.bat`
 4. Instalar Django: `python -m pip install Django`
 5. Instalar dependencias: `pip install -r requirements.txt`
+
+    --> Las siguientes desde natursur (cd natursur):
 6. Migrar base de datos: `python manage.py migrate`
 7. Ejecutar servidor: `python manage.py runserver`
 
