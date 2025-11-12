@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}Inicio - Natursur{% endblock %}
+
 
 {% block content %}
     
@@ -11,7 +14,7 @@
             <!-- Texto y Llamada a la Acción (Izquierda) -->
             <div class="lg:w-1/2 text-center lg:text-left mb-10 lg:mb-0">
                 <h1 class="mt-4 text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight">
-                    El bienestar es una decisión, <span class="text-corporate-green">y empieza hoy</span>
+                    El bienestar es una decisión,<br><span class="text-button-turquesa italic drop-shadow-lg">y empieza hoy</span>
                 </h1>
                 <p class="mt-4 text-lg text-gray-500 max-w-lg mx-auto lg:mx-0">
                     Tu bienestar es una decisión que puedes tomar hoy. Con más de 25 años de experiencia, te ayudo a alcanzar un equilibrio entre cuerpo, mente y alimentación, para que vivas mejor, con energía y sin limitaciones.
@@ -25,14 +28,10 @@
             
             <!-- Imagen Placeholder (Derecha) -->
             <div class="lg:w-1/2">
-                <!-- Placeholder de imagen grande para la sección principal -->
-                <div class="w-full h-80 md:h-96 bg-gray-200 rounded-xl shadow-2xl overflow-hidden relative">
-                    <!-- Puedes reemplazar esto con una imagen real más adelante -->
-                    <div class="absolute inset-0 flex items-center justify-center bg-corporate-green/10">
-                        <span class="text-2xl text-corporate-green opacity-70">
-                            [Imagen Principal Aquí]
-                        </span>
-                    </div>
+                <div class="w-full h-80 md:h-96 rounded-xl shadow-2xl overflow-hidden group">
+                    <img src="{% static 'home/img/Fernando_Principal.png' %}"
+                        alt="Fernando - Especialista en bienestar"
+                        class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                 </div>
             </div>
         </div>
