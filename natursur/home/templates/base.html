@@ -57,8 +57,8 @@
                 <nav class="hidden lg:flex justify-center items-center text-base font-semibold uppercase space-x-12">
                     <!-- Enlaces del menú principal -->
                     <a href="{% url 'home' %}" class="font-semibold text-green-800 hover:text-button-turquesa transition duration-300">Inicio</a>
-                    <a href="#" class="nav-link">Servicios</a>
-                    <a href="#" class="nav-link">Contacto</a>
+                    <a href="{% url 'services' %}" class="nav-link">Servicios</a>
+                    <a href="#contact-info" class="nav-link">Contacto</a>
                 </nav>
 
                 <!-- BOTÓN LOGIN -->
@@ -86,8 +86,8 @@
             <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-gray-200 shadow-lg w-full absolute left-0 top-full">
                 <div class="container mx-auto">
                     <a href="{% url 'home' %}" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200">INICIO</a>
-                    <a href="#" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200">SERVICIOS</a>
-                    <a href="#" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200">CONTACTO</a>
+                    <a href="{% url 'services' %}" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200">SERVICIOS</a>
+                    <a href="#contact-info" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200">CONTACTO</a>
                     <!-- LOGIN EN MÓVIL -->
                     <a href="#" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200" data-open-login>
                         <div class="flex items-center space-x-3">
@@ -133,13 +133,13 @@
                 <h4 class="text-lg font-semibold mb-4 border-b border-corporate-green pb-2">Mapa Web</h4>
                 <ul class="space-y-2 text-sm text-gray-400">
                     <li><a href="{% url 'home' %}" class="hover:text-corporate-green transition duration-300">Inicio</a></li>
-                    <li><a href="#" class="hover:text-corporate-green transition duration-300">Servicios</a></li>
+                    <li><a href="{% url 'services' %}" class="hover:text-corporate-green transition duration-300">Servicios</a></li>
                     <li><a href="#" class="hover:text-corporate-green transition duration-300">Contacto</a></li>
 
                 </ul>
             </div>
-            <div>
-                <h4 class="text-lg font-semibold mb-4 border-b border-corporate-green pb-2">Contacto</h4>
+            <div id="contact-info">
+                <h4 class="text-lg font-semibold mb-4 border-b border-corporate-green pb-2" href="#contact-info">Contacto</h4>
                 <p class="text-sm text-gray-400">
                     📍 Av. Santa Lucía, 62, 41500 Alcalá de Guadaíra, Sevilla
                     <span class="block mt-2">📞Tel: <a href="tel:+34123456789" class="hover:text-corporate-green">+34 691 355 682</a></span>
@@ -451,6 +451,29 @@
                 if (e.target === this) closeRegisterModal();
             });
         });
+
+
+        // JavaScript para el botón de contacto en el footer
+        document.addEventListener('DOMContentLoaded', () => {
+            const contactoLinks = document.querySelectorAll('a[href="#contact-info"]');
+            const contactoSection = document.getElementById('contact-info');
+
+            if (contactoSection) {
+                contactoLinks.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    contactoSection.scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+
+        // JavaScript para el botón de contacto en el footer - MÓVIL
+        document.querySelectorAll('a[href="#contact-info"]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                contactoSection.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+});
     </script>
 
 </body>
