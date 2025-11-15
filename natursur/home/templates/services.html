@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nuestros Servicios | Natursur{% endblock %}
+
+{% block content %}
+
+<section class="py-20 bg-white shadow-md">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+        <h1 class="text-5xl font-extrabold text-[#126853] mb-4">
+            Transforma tu Bienestar
+        </h1>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Descubre nuestra gama de servicios enfocados en la **sostenibilidad, el cuerpo, la mente y la nutrición**, diseñados para un equilibrio total.
+        </p>
+    </div>
+</section>
+
+<section class="py-16 bg-light-background">
+    <div class="max-w-7xl mx-auto px-4">
+        
+        <h2 class="text-4xl font-bold text-center text-corporate-green mb-12">
+            Nuestras Áreas de Enfoque
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+            <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 border-t-4 border-button-turquesa">
+                <div class="text-5xl text-button-turquesa mb-4">
+                    🍎
+                </div>
+                <h3 class="text-2xl font-bold text-[#126853] mb-3">
+                    Nutrición y Dietética
+                </h3>
+                <p class="text-gray-600 mb-6">
+                    Planes alimenticios personalizados para optimizar tu salud, energía y rendimiento. Enfocados en la prevención y el equilibrio.
+                </p>
+                <a href="#" class="inline-block px-6 py-2 border border-button-turquesa text-button-turquesa font-semibold rounded-full hover:bg-button-turquesa hover:text-white transition duration-300">
+                    Saber Más
+                </a>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 border-t-4 border-corporate-green">
+                <div class="text-5xl text-corporate-green mb-4">
+                    🧘‍♀️
+                </div>
+                <h3 class="text-2xl font-bold text-[#126853] mb-3">
+                    Terapias Manuales
+                </h3>
+                <p class="text-gray-600 mb-6">
+                    Masajes terapéuticos, osteopatía y fisioterapia para liberar tensión, corregir posturas y aliviar dolores crónicos.
+                </p>
+                <a href="#" class="inline-block px-6 py-2 border border-corporate-green text-corporate-green font-semibold rounded-full hover:bg-corporate-green hover:text-white transition duration-300">
+                    Saber Más
+                </a>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 border-t-4 border-gray-400">
+                <div class="text-5xl text-gray-600 mb-4">
+                    🧠
+                </div>
+                <h3 class="text-2xl font-bold text-[#126853] mb-3">
+                    Coaching y Mindfulness
+                </h3>
+                <p class="text-gray-600 mb-6">
+                    Sesiones de *coaching* para alcanzar metas y prácticas de *mindfulness* para reducir el estrés y mejorar el enfoque mental.
+                </p>
+                <a href="#" class="inline-block px-6 py-2 border border-gray-400 text-gray-600 font-semibold rounded-full hover:bg-gray-400 hover:text-white transition duration-300">
+                    Saber Más
+                </a>
+            </div>
+
+        </div> </div>
+</section>
+
+<section class="py-16 bg-corporate-green text-green">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-extrabold mb-3">
+            ¿Listo para tu transformación?
+        </h2>
+        <p class="text-lg opacity-90 mb-8">
+            Reserva hoy una consulta inicial y déjanos diseñar el camino hacia tu bienestar integral.
+        </p>
+        <a href="https://calendly.com/natursur/fernando-escalona"
+           target="_blank"
+           class="px-10 py-4 bg-button-turquesa text-green font-bold text-lg rounded-xl shadow-2xl hover:bg-opacity-90 transition duration-300 uppercase transform hover:scale-105">
+            ¡Reserva tu Cita Ahora!
+        </a>
+    </div>
+</section>
+
+{% endblock content %}
