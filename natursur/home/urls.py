@@ -19,4 +19,8 @@ urlpatterns = [
     path('calendario/', views.calendario_mensual, name='calendario'),
     path('calendario/horas-ocupadas/', views.horas_ocupadas, name='horas_ocupadas'),
     path('crear-cita-final/', views.crear_cita_final, name='crear_cita_final'),
+
+    # Administración de mensajes en la cabecera
+    path('directo_promocion/update/', views.update_Directo_Promocion, name='update_Directo_Promocion'),
+    path('directo_promocion/delete/', views.delete_Directo_Promocion, name='delete_Directo_Promocion'),
 ]

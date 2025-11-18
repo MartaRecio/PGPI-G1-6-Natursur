@@ -6,19 +6,19 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from .models import Cita
+from .models import Cita, DirectoPromocion
 from datetime import timedelta, datetime, date
 
 User = get_user_model()
 
 def home_view(request: HttpRequest) -> HttpResponse:
     # Renderiza la plantilla base de la página de inicio.
-    return render(request, 'home/index.html', {})
+    return render(request, 'home/index.html', get_promotion_context())
 
 
 def services_view(request: HttpRequest) -> HttpResponse:
     # Renderiza la plantilla servicios de la página de inicio.
-    return render(request, 'services.html', {})
+    return render(request, 'services.html', get_promotion_context())
 
 
 
@@ -53,7 +53,7 @@ def registro_view(request):
             except Exception as e:
                 messages.error(request, f'Error creando usuario: {str(e)}')
     
-    return render(request, 'home/index.html')
+    return render(request, 'home/index.html', get_promotion_context())
 
 
 @csrf_protect
@@ -126,11 +126,16 @@ def perfil_usuario(request):
         user=request.user,
         fecha__lt=ahora
     ).order_by('-fecha')[:10]
-    
-    return render(request, 'home/perfil.html', {
+
+    context = {
         'citas_programadas': citas_programadas,
         'citas_pasadas': citas_pasadas
-    })
+    }
+    
+    # Fusionar con el contexto de promoción
+    context.update(get_promotion_context())
+    
+    return render(request, 'home/perfil.html', context)
 
 @login_required
 def cambiar_password(request):
@@ -233,6 +238,8 @@ def calendario_mensual(request):
         'nombre_mes_espanol': meses_espanol[mes],
         'hoy': hoy,
     }
+
+    context.update(get_promotion_context())
     
     return render(request, 'home/calendario.html', context)
 
@@ -276,3 +283,65 @@ def crear_cita_final(request):
             messages.error(request, f'Error creando cita: {str(e)}')
     
     return redirect('calendario')
+
+
+@csrf_protect
+def update_Directo_Promocion(request: HttpRequest) -> HttpResponse:
+    if request.method == 'POST':
+        # Nota: Aquí usarías request.POST.get() si el frontend usa un formulario tradicional
+        # o request.body/json.loads() si sigue usando AJAX pero la quieres redirigir.
+        
+        # Asumiendo que has ajustado el frontend para enviar como formulario POST tradicional:
+        text = request.POST.get('message_text', '').strip()
+        url = request.POST.get('message_url', '').strip() or None 
+
+        if not text:
+            messages.error(request, 'El mensaje de cabecera no puede estar vacío.')
+            return redirect('home')
+        
+        try:
+            # Lógica para desactivar y crear/actualizar el mensaje (igual que antes)
+            DirectoPromocion.objects.filter(is_active=True).update(is_active=False)
+            DirectoPromocion.objects.create(text=text, url=url, is_active=True)
+            
+            messages.success(request, 'Mensaje de cabecera actualizado correctamente.')
+            
+        except Exception as e:
+            messages.error(request, f'Error al guardar el mensaje: {str(e)}')
+            
+        return redirect('home') # Forzar recarga completa de la página de inicio
+    
+    # Si alguien intenta acceder con GET, redirigir al inicio
+    return redirect('home')
+
+
+@csrf_protect
+def delete_Directo_Promocion(request: HttpRequest) -> HttpResponse:
+    if request.method == 'POST':
+        try:
+            message = DirectoPromocion.objects.filter(is_active=True).first()
+            
+            if message:
+                message.is_active = False
+                message.save()
+                messages.success(request, 'Mensaje de cabecera eliminado correctamente.')
+            else:
+                messages.info(request, 'No había ningún mensaje activo que eliminar.')
+                
+        except Exception as e:
+            messages.error(request, f'Error al eliminar el mensaje: {str(e)}')
+            
+        return redirect('home') # Forzar recarga completa de la página de inicio
+
+    return redirect('home')
+
+
+# --- FUNCIÓN DE AYUDA PARA EL CONTEXTO PROMOCION (HELPER) ---
+def get_promotion_context():
+    """Busca el mensaje de promoción activo para pasarlo al contexto."""
+    try:
+        current_promocion = DirectoPromocion.objects.filter(is_active=True).first()
+    except Exception:
+        current_promocion = None
+        
+    return {'current_promocion': current_promocion}

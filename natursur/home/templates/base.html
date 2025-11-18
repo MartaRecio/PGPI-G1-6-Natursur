@@ -71,9 +71,43 @@
                 </a>
             </div>
 
+
+            <!-- COLUMNA INTERMEDIA: DIRECTO / PROMOCION -->
+            <div id="promocion-container" class="flex items-center justify-center flex-grow">
+                {% if current_promocion %}
+                    
+                    {% if current_promocion.url %}
+                        <a href="{{ current_promocion.url }}" 
+                        target="_blank" 
+                        class="px-6 py-3 bg-button-turquesa text-white font-bold text-sm rounded-lg shadow-lg hover:bg-opacity-90 transition duration-200 uppercase whitespace-nowrap mr-2">
+                            {{ current_promocion.text }}
+                        </a>
+                    {% else %}
+                        <span class="px-6 py-3 bg-button-turquesa text-white font-bold text-sm rounded-lg shadow-lg uppercase whitespace-nowrap mr-2">
+                            {{ current_promocion.text }}
+                        </span>
+                    {% endif %}
+                    
+                    <form id="delete-form" method="POST" action="{% url 'delete_Directo_Promocion' %}" class="flex items-center ml-0" onsubmit="document.getElementById('delete-message-btn').disabled = true;">
+                        {% csrf_token %}
+                        
+                        <button type="submit" id="delete-message-btn" 
+                                class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-500 rounded-full transition duration-200" 
+                                title="Eliminar mensaje">
+                            <span style="font-size: 1.5rem; line-height: 1;">🗑️</span>
+                        </button>
+                    </form>
+
+                {% else %}
+                    <button id="add-message-btn" class="px-6 py-3 bg-button-turquesa text-white font-bold text-sm rounded-lg shadow-lg hover:bg-opacity-90 transition duration-200 uppercase whitespace-nowrap ml-8" onclick="openModal()">
+                        Añadir Promoción
+                    </button>
+                {% endif %}
+            </div>
+
             <!-- COLUMNA 2: MENÚ DE NAVEGACIÓN  -->
             <div class="flex items-center justify-end flex-none space-x-8">
-                <nav class="hidden lg:flex justify-center items-center text-base font-semibold uppercase space-x-12">
+                <nav class="hidden lg:flex justify-center items-center text-base font-semibold uppercase space-x-6">
                     <!-- Enlaces del menú principal -->
                     <a href="{% url 'home' %}" class="font-semibold text-green-800 hover:text-button-turquesa transition duration-300">Inicio</a>
                     <a href="{% url 'services' %}" class="nav-link">Servicios</a>
@@ -152,6 +186,55 @@
                             </div>
                         </a>
                     {% endif %}
+                </div>
+            </div>
+
+            <div id="promocion-modal" 
+                class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+                
+                <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-95 opacity-0"
+                    id="promocion-modal-content">
+                    
+                    <div class="bg-[#126853] text-white p-6 rounded-t-2xl">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold">Añadir Promoción</h3>
+                            <button type="button" class="text-white hover:text-gray-200 text-2xl" onclick="closeModal()">
+                                &times;
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="update-form" method="POST" action="{% url 'update_Directo_Promocion' %}" class="p-6 space-y-4">
+                        {% csrf_token %}
+                        <div>
+                            <label for="message-text" class="block text-sm font-medium text-gray-700 mb-2">Mensaje a mostrar</label>
+                            <input 
+                                type="text" 
+                                name="message_text" 
+                                id="message-text"
+                                placeholder="Introduce el mensaje de promoción" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-button-turquesa"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label for="message-url" class="block text-sm font-medium text-gray-700 mb-2">Hipervínculo (opcional)</label>
+                            <input 
+                                type="url" 
+                                name="message_url" 
+                                id="message-url"
+                                placeholder="URL de destino" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-button-turquesa"
+                            />
+                        </div>
+                        
+                        <div class="flex justify-end pt-4">
+                            <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2 hover:bg-gray-600 transition" onclick="closeModal()">Cancelar</button>
+                            <button type="submit" class="px-4 py-2 bg-button-turquesa text-white rounded-lg hover:bg-opacity-90 transition">Guardar</button>
+                        </div>
+                    </form>
+
                 </div>
             </div>
     </header>
@@ -475,6 +558,58 @@
         }
 
 
+        // Funciones de JavaScript para abrir y cerrar el Modal
+        function openModal() {
+            // 1. Ocultar el botón original (para que no se vea detrás del modal)
+            const modal = document.getElementById('promocion-modal');
+            const content = document.getElementById('promocion-modal-content');
+            const addButton = document.getElementById('add-message-btn');
+            if (addButton) {
+                // Ocultar el botón al hacer clic
+                addButton.style.display = 'none';
+            }
+    
+            // 2. Mostrar el modal flotante
+            modal.classList.remove('hidden');
+
+            // Aplicar transición suave
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('promocion-modal');
+            const content = document.getElementById('promocion-modal-content');
+            const addButton = document.getElementById('add-message-btn');
+            
+            // Iniciar transición de cierre
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            // Ocultar el fondo y restaurar el botón después de la transición (300ms)
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (addButton) {
+                    addButton.style.display = 'inline-block'; 
+                }
+            }, 300);
+        }
+
+        // Opcional: Cerrar modal haciendo clic fuera
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('promocion-modal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeModal();
+                    }
+                });
+            }
+        });
+
+
 
         // Cuando la página carga
         document.addEventListener('DOMContentLoaded', function() {
@@ -536,6 +671,129 @@
             setTimeout(() => msg.remove(), 500);
         });
     }, 2000);
+    </script>
+
+    <!-- JavaScript para la gestión del mensaje administrativo -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('admin-message-container');
+        const addButton = document.getElementById('add-message-btn');
+        const deleteButton = document.getElementById('delete-message-btn');
+        const inputArea = document.getElementById('message-input-area');
+        const saveButton = document.getElementById('save-message-btn');
+        const cancelButton = document.getElementById('cancel-input-btn');
+        const messageText = document.getElementById('message-text');
+        const messageUrl = document.getElementById('message-url');
+
+        // Función para obtener el token CSRF de Django
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // --- EVENTOS DEL FRONTEND ---
+
+        // 1. Mostrar el área de inputs al hacer clic en 'Añadir Mensaje'
+        if (addButton) {
+            addButton.addEventListener('click', function() {
+                addButton.style.display = 'none';
+                inputArea.style.display = 'block';
+            });
+        }
+
+        // 2. Cancelar la entrada de mensaje
+        if (cancelButton) {
+            cancelButton.addEventListener('click', function() {
+                messageText.value = '';
+                messageUrl.value = '';
+                inputArea.style.display = 'none';
+                if (addButton) addButton.style.display = 'inline-block';
+            });
+        }
+
+        // --- LÓGICA DE GUARDADO (AJAX) ---
+        if (saveButton) {
+            saveButton.addEventListener('click', function() {
+                const text = messageText.value;
+                const url = messageUrl.value;
+
+                if (!text) {
+                    alert('El mensaje no puede estar vacío.');
+                    return;
+                }
+
+                fetch('{% url "update_Directo_Promocion" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({ text: text, url: url })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Reemplaza el contenido del contenedor con el mensaje y el botón de eliminar
+                        container.innerHTML = `
+                            <span id="current-message-display">${data.message_html}</span>
+                            <button id="delete-message-btn" class="btn btn-sm btn-danger ml-2" title="Eliminar mensaje">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        `;
+                        // Vuelve a adjuntar el event listener al nuevo botón de eliminar
+                        document.getElementById('delete-message-btn').addEventListener('click', handleDelete);
+                    } else {
+                        alert('Error al guardar: ' + data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+
+        // --- LÓGICA DE ELIMINACIÓN (AJAX) ---
+        function handleDelete() {
+            fetch('{% url "delete_Directo_Promocion" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Vuelve al estado inicial del botón de añadir
+                    container.innerHTML = `
+                        <button id="add-message-btn" class="btn btn-sm btn-success">
+                            Añadir Mensaje
+                        </button>
+                        <div id="message-input-area" style="display: none;">...</div>
+                    `;
+                    // Para que la funcionalidad siga viva sin recarga, tendrías que re-inicializar
+                    // el DOM (o recargar la página), pero por simplicidad de este ejemplo,
+                    // la recarga o re-inicialización de listeners es necesaria.
+                    window.location.reload(); // La forma más simple
+                } else {
+                    alert('Error al eliminar el mensaje.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        if (deleteButton) {
+            deleteButton.addEventListener('click', handleDelete);
+        }
+    });
     </script>
 </body>
 </html>
