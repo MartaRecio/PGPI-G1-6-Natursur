@@ -124,6 +124,7 @@ AUTH_USER_MODEL = 'home.User'
 
 
 # Redirecciones después de login/logout
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
