@@ -19,4 +19,7 @@ urlpatterns = [
     path('calendario/', views.calendario_mensual, name='calendario'),
     path('calendario/horas-ocupadas/', views.horas_ocupadas, name='horas_ocupadas'),
     path('crear-cita-final/', views.crear_cita_final, name='crear_cita_final'),
+
+    # Productos Herbalife
+    path("productos/", views.lista_productos, name="lista_productos"),
 ]
