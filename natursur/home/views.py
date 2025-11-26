@@ -435,7 +435,7 @@ def admin_cancelar_cita(request, cita_id):
 
 def lista_productos(request):
     productos = Producto.objects.all()  # Todos los productos
-    return render(request, "home/productos.html", {"productos": productos}) + '?tab=gestion-citas')
+    return render(request, "home/productos.html", {"productos": productos})
 
 # Vista para listar (Igual que antes)
 def lista_promociones(request):
