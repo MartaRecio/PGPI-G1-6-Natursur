@@ -15,8 +15,21 @@ from django.urls import reverse
 User = get_user_model()
 
 def home_view(request: HttpRequest) -> HttpResponse:
-    # Renderiza la plantilla base de la página de inicio.
-    return render(request, 'home/index.html', {})
+    hoy = timezone.now().date()
+    
+    # Recuperar promociones activas
+    promociones_activas = Promocion.objects.filter(
+        activa=True,
+        fecha_inicio__lte=hoy,
+        fecha_fin__gte=hoy
+    )
+
+    # Recuperar el directo activo (si existe)
+    current_directo = Directo.objects.filter(is_active=True).first()
+
+    return render(request, 'home/index.html', {
+        'promociones_activas': promociones_activas,
+        'current_directo': current_directo,})
 
 
 def services_view(request: HttpRequest) -> HttpResponse:
