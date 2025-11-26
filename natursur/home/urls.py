@@ -26,7 +26,10 @@ urlpatterns = [
     path('admin/cambiar-password/', views.admin_cambiar_password, name='admin_cambiar_password'),
     path('admin/gestion-citas/', views.admin_gestion_citas, name='admin_gestion_citas'),
 
+    # Productos Herbalife
+    path("productos/", views.lista_productos, name="lista_productos"),
+
     # Administración de mensajes en la cabecera
-    path('directo_promocion/update/', views.update_Directo_Promocion, name='update_Directo_Promocion'),
-    path('directo_promocion/delete/', views.delete_Directo_Promocion, name='delete_Directo_Promocion'),
+    path('directo/update/', views.update_Directo, name='update_Directo'),
+    path('directo/delete/', views.delete_Directo, name='delete_Directo'),
 ]

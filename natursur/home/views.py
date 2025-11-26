@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from .models import Cita, DirectoPromocion
 from datetime import timedelta, datetime, date
+from .models import Producto
 
 User = get_user_model()
 
@@ -419,9 +420,13 @@ def admin_cancelar_cita(request, cita_id):
     
     return redirect('admin_gestion_citas')
 
+def lista_productos(request):
+    productos = Producto.objects.all()  # Todos los productos
+    return render(request, "home/productos.html", {"productos": productos})
+
 
 @csrf_protect
-def update_Directo_Promocion(request: HttpRequest) -> HttpResponse:
+def update_Directon(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         # Nota: Aquí usarías request.POST.get() si el frontend usa un formulario tradicional
         # o request.body/json.loads() si sigue usando AJAX pero la quieres redirigir.
@@ -451,7 +456,7 @@ def update_Directo_Promocion(request: HttpRequest) -> HttpResponse:
 
 
 @csrf_protect
-def delete_Directo_Promocion(request: HttpRequest) -> HttpResponse:
+def delete_Directo(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         try:
             message = DirectoPromocion.objects.filter(is_active=True).first()
@@ -471,12 +476,12 @@ def delete_Directo_Promocion(request: HttpRequest) -> HttpResponse:
     return redirect('home')
 
 
-# --- FUNCIÓN DE AYUDA PARA EL CONTEXTO PROMOCION (HELPER) ---
-def get_promotion_context():
-    """Busca el mensaje de promoción activo para pasarlo al contexto."""
+# --- FUNCIÓN DE AYUDA PARA EL CONTEXTO DIRECTO (HELPER) ---
+def get_directo_context():
+    """Busca el mensaje de directo activo para pasarlo al contexto."""
     try:
-        current_promocion = DirectoPromocion.objects.filter(is_active=True).first()
+        current_directo = Directo.objects.filter(is_active=True).first()
     except Exception:
-        current_promocion = None
+        current_directo = None
         
-    return {'current_promocion': current_promocion}
+    return {'current_directo': current_directo}
