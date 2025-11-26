@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from .models import Cita
 from datetime import timedelta, datetime, date
+from .models import Producto
 
 User = get_user_model()
 
@@ -411,3 +412,7 @@ def admin_cancelar_cita(request, cita_id):
         messages.error(request, 'Cita no encontrada')
     
     return redirect('admin_gestion_citas')
+
+def lista_productos(request):
+    productos = Producto.objects.all()  # Todos los productos
+    return render(request, "home/productos.html", {"productos": productos})

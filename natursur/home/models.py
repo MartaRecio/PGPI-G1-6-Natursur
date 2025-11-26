@@ -41,3 +41,13 @@ class Cita(models.Model):
 
     def __str__(self):
         return f"{self.tipo} - {self.fecha} ({self.user.username})"
+
+class Producto(models.Model):
+    nombre = models.CharField(max_length=255)
+    precio = models.CharField(max_length=50)  # Lo guardamos como texto por formatos “37,92 €”
+    
+    img_url = models.URLField(max_length=500, blank=True, null=True)
+    link = models.URLField(max_length=500, blank=True, null=True)
+
+    def __str__(self):
+        return self.nombre
