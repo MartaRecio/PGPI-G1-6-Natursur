@@ -41,3 +41,14 @@ class Cita(models.Model):
 
     def __str__(self):
         return f"{self.tipo} - {self.fecha} ({self.user.username})"
+    
+
+class Promocion(models.Model):
+    nombre = models.CharField(max_length=100, verbose_name="Nombre de la promoción")
+    descripcion = models.CharField(max_length=200, verbose_name="Descripción del descuento (ej. 10%)")
+    fecha_inicio = models.DateField(verbose_name="Vigencia Desde")
+    fecha_fin = models.DateField(verbose_name="Vigencia Hasta")
+    activa = models.BooleanField(default=True, verbose_name="¿Activa?")
+
+    def __str__(self):
+        return self.nombre
