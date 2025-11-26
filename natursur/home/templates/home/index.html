@@ -20,9 +20,15 @@
                     Tu bienestar es una decisión que puedes tomar hoy. Con más de 25 años de experiencia, te ayudo a alcanzar un equilibrio entre cuerpo, mente y alimentación, para que vivas mejor, con energía y sin limitaciones.
                 </p>
                 <div class="mt-8 flex justify-center lg:justify-start space-x-4">
-                    <a href="https://calendly.com/natursur/fernando-escalona" target="_blank" class="px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-button-turquesa hover:bg-opacity-90 md:py-4 md:text-lg md:px-10 shadow-xl transition duration-300">
-                        RESERVA TU SESIÓN AHORA
-                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'calendario' %}" target="_blank" class="px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-button-turquesa hover:bg-opacity-90 md:py-4 md:text-lg md:px-10 shadow-xl transition duration-300">
+                            RESERVA TU SESIÓN AHORA
+                        </a>
+                    {% else %}
+                        <button onclick="openLoginModal()" class="px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-button-turquesa hover:bg-opacity-90 md:py-4 md:text-lg md:px-10 shadow-xl transition duration-300">
+                            RESERVA TU SESIÓN AHORA
+                        </button>
+                    {% endif %}
                 </div>
             </div>
             
