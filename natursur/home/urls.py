@@ -26,6 +26,9 @@ urlpatterns = [
     path('admin/cambiar-password/', views.admin_cambiar_password, name='admin_cambiar_password'),
     path('admin/gestion-citas/', views.admin_gestion_citas, name='admin_gestion_citas'),
 
+    # Productos Herbalife
+    path("productos/", views.lista_productos, name="lista_productos"),
+
     # Promociones
     path('promociones/nueva/', views.crear_promocion, name='crear_promocion'),
     path('promociones/toggle/<int:pk>/', views.toggle_promocion, name='toggle_promocion'),

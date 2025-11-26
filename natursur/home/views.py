@@ -9,6 +9,7 @@ from django.utils import timezone
 from .models import Cita, Promocion
 from django.views.decorators.http import require_POST
 from datetime import timedelta, datetime, date
+from .models import Producto
 from django.urls import reverse
 
 User = get_user_model()
@@ -431,6 +432,10 @@ def admin_cancelar_cita(request, cita_id):
         messages.error(request, 'Cita no encontrada')
     
     return redirect(reverse('admin_gestion_citas') + '?tab=gestion-citas')
+
+def lista_productos(request):
+    productos = Producto.objects.all()  # Todos los productos
+    return render(request, "home/productos.html", {"productos": productos}) + '?tab=gestion-citas')
 
 # Vista para listar (Igual que antes)
 def lista_promociones(request):
