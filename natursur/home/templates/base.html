@@ -96,9 +96,9 @@
                             <span class="text-[#00857A] font-medium whitespace-nowrap">¡Hola, {{ user.username }}!</span>
                         </div>
                         
-                        <!-- Dropdown menu (para futura implementación) -->
+                        <!-- Dropdown menu  -->
                         <div class="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                            <a href="{% url 'perfil' %}" class="block px-4 py-3 text-gray-700 hover:bg-gray-100 transition duration-200">
+                            <a href="{% if user.is_superuser %}{% url 'admin_editar_perfil' %}{% else %}{% url 'perfil' %}{% endif %}" " class="block px-4 py-3 text-gray-700 hover:bg-gray-100 transition duration-200">
                                 Mi Perfil
                             </a>
                             <div class="border-t border-gray-200"></div>
@@ -147,7 +147,7 @@
                     <!-- LOGIN EN MÓVIL -->
                     {% if user.is_authenticated %}
                         <!-- Estado móvil: Usuario logueado -->
-                        <a href="{% url 'perfil' %}" class="block py-4 px-6 border-b bg-[#cce7e5] hover:bg-[#00A69A] hover:text-white text-[#00857A] font-semibold transition duration-200">MI PERFIL</a>
+                        <a href="{% if user.is_superuser %}{% url 'admin_editar_perfil' %}{% else %}{% url 'perfil' %}{% endif %}" class="block py-4 px-6 border-b bg-[#cce7e5] hover:bg-[#00A69A] hover:text-white text-[#00857A] font-semibold transition duration-200">MI PERFIL</a>
                         <a href="{% url 'logout' %}" class="block py-4 px-6 border-b bg-[#fee] hover:bg-red-600 hover:text-white text-red-600 transition duration-200">CERRAR SESIÓN</a>
                     {% else %}
                         <!-- Estado móvil: Usuario no logueado -->
