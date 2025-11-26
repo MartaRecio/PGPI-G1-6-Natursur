@@ -52,6 +52,19 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
     
+
+class Promocion(models.Model):
+    nombre = models.CharField(max_length=100, verbose_name="Nombre de la promoción")
+    descripcion = models.CharField(max_length=200, verbose_name="Descripción del descuento (ej. 10%)")
+    fecha_inicio = models.DateField(verbose_name="Vigencia Desde")
+    fecha_fin = models.DateField(verbose_name="Vigencia Hasta")
+    activa = models.BooleanField(default=True, verbose_name="¿Activa?")
+
+    def __str__(self):
+        return self.nombre
+    
+
+    
 class Directo(models.Model):
     """
     Modelo para almacenar el mensaje que se muestra globalmente en la cabecera.

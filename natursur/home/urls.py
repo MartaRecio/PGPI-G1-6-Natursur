@@ -29,6 +29,11 @@ urlpatterns = [
     # Productos Herbalife
     path("productos/", views.lista_productos, name="lista_productos"),
 
+    # Promociones
+    path('promociones/nueva/', views.crear_promocion, name='crear_promocion'),
+    path('promociones/toggle/<int:pk>/', views.toggle_promocion, name='toggle_promocion'),
+    path('promociones/eliminar/<int:pk>/', views.eliminar_promocion, name='eliminar_promocion'),
+
     # Administración de mensajes en la cabecera
     path('directo/update/', views.update_Directo, name='update_Directo'),
     path('directo/delete/', views.delete_Directo, name='delete_Directo'),
