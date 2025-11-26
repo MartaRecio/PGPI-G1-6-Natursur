@@ -19,4 +19,10 @@ urlpatterns = [
     path('calendario/', views.calendario_mensual, name='calendario'),
     path('calendario/horas-ocupadas/', views.horas_ocupadas, name='horas_ocupadas'),
     path('crear-cita-final/', views.crear_cita_final, name='crear_cita_final'),
+
+    # Perfil administrador
+    path('admin/cancelar-cita/<int:cita_id>/', views.admin_cancelar_cita, name='admin_cancelar_cita'),
+    path('admin/editar-perfil/', views.admin_editar_perfil, name='admin_editar_perfil'),
+    path('admin/cambiar-password/', views.admin_cambiar_password, name='admin_cambiar_password'),
+    path('admin/gestion-citas/', views.admin_gestion_citas, name='admin_gestion_citas'),
 ]
