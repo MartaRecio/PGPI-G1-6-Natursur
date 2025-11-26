@@ -62,3 +62,16 @@ class Promocion(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+
+    
+class Directo(models.Model):
+    """
+    Modelo para almacenar el mensaje que se muestra globalmente en la cabecera.
+    """
+    text = models.CharField(max_length=255, verbose_name="Mensaje de cabecera")
+    url = models.URLField(max_length=200, blank=True, null=True, verbose_name="Hipervínculo (opcional)")
+    is_active = models.BooleanField(default=False, verbose_name="¿Activo para mostrar?")
+    
+    def __str__(self):
+        return self.text
