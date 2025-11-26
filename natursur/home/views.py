@@ -254,7 +254,6 @@ def horas_ocupadas(request):
 
     
 
-@login_required
 def crear_cita_final(request):
     if request.method == 'POST':
         fecha_str = request.POST.get('fecha')
@@ -271,12 +270,148 @@ def crear_cita_final(request):
             cita = Cita.objects.create(user=request.user, fecha=fecha_hora, tipo=tipo)
             tipo_display = dict(Cita.TIPOS_CITA).get(tipo, tipo)
             messages.success(request, f'Cita de {tipo_display} creada para el {fecha_str} a las {hora_str}')
-            return redirect('perfil')
+            
+            if request.user.is_superuser:
+                return redirect('admin_gestion_citas')
+            else:
+                return redirect('perfil')
             
         except Exception as e:
             messages.error(request, f'Error creando cita: {str(e)}')
     
     return redirect('calendario')
+
+
+# =============================================
+# VISTAS DE ADMINISTRACIÓN FERNANDO
+# =============================================
+
+def obtener_datos_citas_admin():
+    ahora = timezone.now()
+    
+    citas_futuras = Cita.objects.filter(fecha__gte=ahora).select_related('user').order_by('fecha')
+    citas_pasadas = Cita.objects.filter(fecha__lt=ahora).select_related('user').order_by('-fecha')
+    
+    citas = list(citas_futuras) + list(citas_pasadas)
+    
+    for cita in citas:
+        cita.es_futura = cita.fecha >= ahora
+    
+    proxima_cita = citas_futuras.first()
+    
+    if proxima_cita:
+        hoy = ahora.date()
+        dias_restantes = (proxima_cita.fecha.date() - hoy).days
+        if dias_restantes == 0:
+            proxima_cita.dias_restantes = "Hoy"
+        elif dias_restantes == 1:
+            proxima_cita.dias_restantes = "Mañana"
+        else:
+            proxima_cita.dias_restantes = f"En {dias_restantes} días"
+    
+    hoy = ahora.date()
+    semana_siguiente = hoy + timedelta(days=7)
+    
+    citas_hoy_count = citas_futuras.filter(fecha__date=hoy).count()
+    citas_semana_count = citas_futuras.filter(fecha__date__range=[hoy, semana_siguiente]).count()
+    total_citas_futuras = citas_futuras.count()
+    
+    return {
+        'citas': citas,
+        'proxima_cita': proxima_cita,
+        'total_citas': total_citas_futuras,
+        'citas_hoy_count': citas_hoy_count,
+        'citas_semana_count': citas_semana_count,
+    }
+
+@login_required
+def admin_editar_perfil(request):
+    if not request.user.is_superuser:
+        return redirect('home')
+    
+    if request.method == 'POST':
+        cambios_realizados = False
+        nuevo_username = request.POST.get('username')
+        nuevo_email = request.POST.get('email')
+        telefono = request.POST.get('telefono')
+        
+        if nuevo_username and nuevo_username != request.user.username:
+            request.user.username = nuevo_username
+            cambios_realizados = True
+        
+        if nuevo_email and nuevo_email != request.user.email:
+            request.user.email = nuevo_email
+            cambios_realizados = True
+        
+        telefono_vacio = telefono if telefono else None
+        if telefono != request.user.telefono:
+            request.user.telefono = telefono_vacio
+            cambios_realizados = True
+
+        if cambios_realizados:
+            request.user.save()
+            messages.success(request, 'Datos actualizados correctamente')
+        else:
+            messages.info(request, 'No se realizaron cambios')
+    
+    context = obtener_datos_citas_admin()
+    context['seccion_activa'] = 'mi-perfil'
+    
+    return render(request, 'home/admin.html', context)
+
+@login_required
+def admin_cambiar_password(request):
+    if not request.user.is_superuser:
+        return redirect('home')
+    
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        if request.user.check_password(current_password):
+            if new_password == confirm_password:
+                if len(new_password) < 3:
+                    messages.error(request, 'La contraseña debe tener al menos 3 caracteres')
+                else:
+                    request.user.set_password(new_password)
+                    request.user.save()
+                    update_session_auth_hash(request, request.user)
+                    messages.success(request, 'Contraseña cambiada correctamente')
+            else:
+                messages.error(request, 'Las contraseñas no coinciden')
+        else:
+            messages.error(request, 'Contraseña actual incorrecta')
+    
+    context = obtener_datos_citas_admin()
+    context['seccion_activa'] = 'mi-perfil'
+    
+    return render(request, 'home/admin.html', context)
+
+@login_required
+def admin_gestion_citas(request):
+    if not request.user.is_superuser:
+        return redirect('home')
+    
+    context = obtener_datos_citas_admin()
+    context['seccion_activa'] = 'gestion-citas'
+    
+    return render(request, 'home/admin.html', context)
+
+@login_required
+def admin_cancelar_cita(request, cita_id):
+    if not request.user.is_superuser:
+        messages.error(request, 'Sin permisos')
+        return redirect('perfil')
+    
+    try:
+        cita = Cita.objects.get(id=cita_id)
+        cita.delete()
+        messages.success(request, 'Cita cancelada')
+    except Cita.DoesNotExist:
+        messages.error(request, 'Cita no encontrada')
+    
+    return redirect('admin_gestion_citas')
 
 def lista_productos(request):
     productos = Producto.objects.all()  # Todos los productos
