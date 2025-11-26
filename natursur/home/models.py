@@ -52,7 +52,6 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
     
-
 class Directo(models.Model):
     """
     Modelo para almacenar el mensaje que se muestra globalmente en la cabecera.

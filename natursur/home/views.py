@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from .models import Cita, DirectoPromocion
+from .models import Cita, Directo
 from datetime import timedelta, datetime, date
 from .models import Producto
 
@@ -14,12 +14,12 @@ User = get_user_model()
 
 def home_view(request: HttpRequest) -> HttpResponse:
     # Renderiza la plantilla base de la página de inicio.
-    return render(request, 'home/index.html', get_promotion_context())
+    return render(request, 'home/index.html', get_directo_context())
 
 
 def services_view(request: HttpRequest) -> HttpResponse:
     # Renderiza la plantilla servicios de la página de inicio.
-    return render(request, 'services.html', get_promotion_context())
+    return render(request, 'services.html', get_directo_context())
 
 
 
@@ -54,7 +54,7 @@ def registro_view(request):
             except Exception as e:
                 messages.error(request, f'Error creando usuario: {str(e)}')
     
-    return render(request, 'home/index.html', get_promotion_context())
+    return render(request, 'home/index.html', get_directo_context())
 
 
 @csrf_protect
@@ -134,7 +134,7 @@ def perfil_usuario(request):
     }
     
     # Fusionar con el contexto de promoción
-    context.update(get_promotion_context())
+    context.update(get_directo_context())
     
     return render(request, 'home/perfil.html', context)
 
@@ -240,7 +240,7 @@ def calendario_mensual(request):
         'hoy': hoy,
     }
 
-    context.update(get_promotion_context())
+    context.update(get_directo_context())
     
     return render(request, 'home/calendario.html', context)
 
@@ -426,23 +426,27 @@ def lista_productos(request):
 
 
 @csrf_protect
-def update_Directon(request: HttpRequest) -> HttpResponse:
+def update_Directo(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         # Nota: Aquí usarías request.POST.get() si el frontend usa un formulario tradicional
         # o request.body/json.loads() si sigue usando AJAX pero la quieres redirigir.
         
         # Asumiendo que has ajustado el frontend para enviar como formulario POST tradicional:
         text = request.POST.get('message_text', '').strip()
-        url = request.POST.get('message_url', '').strip() or None 
+        url = request.POST.get('message_url', '').strip() 
 
         if not text:
             messages.error(request, 'El mensaje de cabecera no puede estar vacío.')
             return redirect('home')
         
+        if not url:
+            messages.error(request, 'La url no puede estar vacío.')
+            return redirect('home')
+        
         try:
             # Lógica para desactivar y crear/actualizar el mensaje (igual que antes)
-            DirectoPromocion.objects.filter(is_active=True).update(is_active=False)
-            DirectoPromocion.objects.create(text=text, url=url, is_active=True)
+            Directo.objects.filter(is_active=True).update(is_active=False)
+            Directo.objects.create(text=text, url=url, is_active=True)
             
             messages.success(request, 'Mensaje de cabecera actualizado correctamente.')
             
@@ -459,7 +463,7 @@ def update_Directon(request: HttpRequest) -> HttpResponse:
 def delete_Directo(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         try:
-            message = DirectoPromocion.objects.filter(is_active=True).first()
+            message = Directo.objects.filter(is_active=True).first()
             
             if message:
                 message.is_active = False
