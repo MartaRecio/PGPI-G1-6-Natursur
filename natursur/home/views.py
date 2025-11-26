@@ -253,7 +253,6 @@ def horas_ocupadas(request):
 
     
 
-@login_required
 def crear_cita_final(request):
     if request.method == 'POST':
         fecha_str = request.POST.get('fecha')
@@ -270,7 +269,11 @@ def crear_cita_final(request):
             cita = Cita.objects.create(user=request.user, fecha=fecha_hora, tipo=tipo)
             tipo_display = dict(Cita.TIPOS_CITA).get(tipo, tipo)
             messages.success(request, f'Cita de {tipo_display} creada para el {fecha_str} a las {hora_str}')
-            return redirect('perfil')
+            
+            if request.user.is_superuser:
+                return redirect('admin_gestion_citas')
+            else:
+                return redirect('perfil')
             
         except Exception as e:
             messages.error(request, f'Error creando cita: {str(e)}')
