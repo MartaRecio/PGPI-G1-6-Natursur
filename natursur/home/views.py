@@ -339,6 +339,8 @@ def obtener_datos_citas_admin():
     total_citas_futuras = citas_futuras.count()
     # Añadir promociones al contexto
     promociones = Promocion.objects.all().order_by('-id')
+    # Añadir mensaje directo activo al contexto
+    current_directo = Directo.objects.filter(is_active=True).first()
     
     return {
         'citas': citas,
@@ -347,6 +349,7 @@ def obtener_datos_citas_admin():
         'citas_hoy_count': citas_hoy_count,
         'citas_semana_count': citas_semana_count,
         'promociones': promociones,
+        'current_directo': current_directo,
     }
 
 @login_required
@@ -440,7 +443,9 @@ def admin_cancelar_cita(request, cita_id):
 
 def lista_productos(request):
     productos = Producto.objects.all()  # Todos los productos
-    return render(request, "home/productos.html", {"productos": productos})
+    context = {"productos": productos}
+    context.update(get_directo_context())
+    return render(request, "home/productos.html", context)
 
 # Vista para listar (Igual que antes)
 def lista_promociones(request):
