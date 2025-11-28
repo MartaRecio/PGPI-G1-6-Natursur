@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
@@ -6,19 +6,35 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from .models import Cita
+from .models import Cita, Promocion, Directo
+from django.views.decorators.http import require_POST
 from datetime import timedelta, datetime, date
+from .models import Producto
+from django.urls import reverse
 
 User = get_user_model()
 
 def home_view(request: HttpRequest) -> HttpResponse:
-    # Renderiza la plantilla base de la página de inicio.
-    return render(request, 'home/index.html', {})
+    hoy = timezone.now().date()
+    
+    # Recuperar promociones activas
+    promociones_activas = Promocion.objects.filter(
+        activa=True,
+        fecha_inicio__lte=hoy,
+        fecha_fin__gte=hoy
+    )
+
+    # Recuperar el directo activo (si existe)
+    current_directo = Directo.objects.filter(is_active=True).first()
+
+    return render(request, 'home/index.html', {
+        'promociones_activas': promociones_activas,
+        'current_directo': current_directo,})
 
 
 def services_view(request: HttpRequest) -> HttpResponse:
     # Renderiza la plantilla servicios de la página de inicio.
-    return render(request, 'services.html', {})
+    return render(request, 'services.html', get_directo_context())
 
 
 
@@ -53,7 +69,7 @@ def registro_view(request):
             except Exception as e:
                 messages.error(request, f'Error creando usuario: {str(e)}')
     
-    return render(request, 'home/index.html')
+    return render(request, 'home/index.html', get_directo_context())
 
 
 @csrf_protect
@@ -126,11 +142,16 @@ def perfil_usuario(request):
         user=request.user,
         fecha__lt=ahora
     ).order_by('-fecha')[:10]
-    
-    return render(request, 'home/perfil.html', {
+
+    context = {
         'citas_programadas': citas_programadas,
         'citas_pasadas': citas_pasadas
-    })
+    }
+    
+    # Fusionar con el contexto de promoción
+    context.update(get_directo_context())
+    
+    return render(request, 'home/perfil.html', context)
 
 @login_required
 def cambiar_password(request):
@@ -233,6 +254,8 @@ def calendario_mensual(request):
         'nombre_mes_espanol': meses_espanol[mes],
         'hoy': hoy,
     }
+
+    context.update(get_directo_context())
     
     return render(request, 'home/calendario.html', context)
 
@@ -271,7 +294,7 @@ def crear_cita_final(request):
             messages.success(request, f'Cita de {tipo_display} creada para el {fecha_str} a las {hora_str}')
             
             if request.user.is_superuser:
-                return redirect('admin_gestion_citas')
+                return redirect(reverse('admin_gestion_citas') + '?tab=gestion-citas')
             else:
                 return redirect('perfil')
             
@@ -314,6 +337,8 @@ def obtener_datos_citas_admin():
     citas_hoy_count = citas_futuras.filter(fecha__date=hoy).count()
     citas_semana_count = citas_futuras.filter(fecha__date__range=[hoy, semana_siguiente]).count()
     total_citas_futuras = citas_futuras.count()
+    # Añadir promociones al contexto
+    promociones = Promocion.objects.all().order_by('-id')
     
     return {
         'citas': citas,
@@ -321,6 +346,7 @@ def obtener_datos_citas_admin():
         'total_citas': total_citas_futuras,
         'citas_hoy_count': citas_hoy_count,
         'citas_semana_count': citas_semana_count,
+        'promociones': promociones,
     }
 
 @login_required
@@ -410,4 +436,134 @@ def admin_cancelar_cita(request, cita_id):
     except Cita.DoesNotExist:
         messages.error(request, 'Cita no encontrada')
     
-    return redirect('admin_gestion_citas')
+    return redirect(reverse('admin_gestion_citas') + '?tab=gestion-citas')
+
+def lista_productos(request):
+    productos = Producto.objects.all()  # Todos los productos
+    return render(request, "home/productos.html", {"productos": productos})
+
+# Vista para listar (Igual que antes)
+def lista_promociones(request):
+    promociones = Promocion.objects.all().order_by('-id')
+    return render(request, 'promociones/lista.html', {'promociones': promociones})
+
+# Vista para crear nueva promoción
+def crear_promocion(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        descripcion = request.POST.get('descripcion')
+        fecha_inicio = request.POST.get('fecha_inicio')
+        fecha_fin = request.POST.get('fecha_fin')
+        activa = request.POST.get('activa') == 'on'
+
+        try:
+            if fecha_inicio and fecha_fin:
+                if fecha_fin < fecha_inicio:
+                    raise ValueError("La fecha de fin no puede ser anterior a la de inicio")
+
+            promo = Promocion.objects.create(
+                nombre=nombre,
+                descripcion=descripcion,
+                fecha_inicio=fecha_inicio,
+                fecha_fin=fecha_fin,
+                activa=activa
+            )
+            
+            # CRÍTICO: Si la petición viene del JavaScript (Modal), devolvemos JSON
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'ok', 'id': promo.id})
+                
+        except Exception as e:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'error', 'errors': str(e)}, status=400)
+
+        # Si no es AJAX, redirigimos al panel administrativo pestaña anuncios
+        return redirect(reverse('admin_gestion_citas') + '?tab=anuncios') 
+    
+    # Si es GET, redirigimos al panel
+    return redirect(reverse('admin_gestion_citas') + '?tab=anuncios')
+
+# API para el interruptor (Toggle ON/OFF)
+@require_POST
+def toggle_promocion(request, pk):
+    promocion = get_object_or_404(Promocion, pk=pk)
+    promocion.activa = not promocion.activa
+    promocion.save()
+    return JsonResponse({'status': 'ok', 'activa': promocion.activa})
+
+@login_required
+def eliminar_promocion(request, pk):
+    if not request.user.is_superuser:
+        return redirect('home')
+        
+    promocion = get_object_or_404(Promocion, pk=pk)
+    promocion.delete()
+    
+    # Redirigimos de vuelta al panel, pestaña anuncios
+    return redirect(reverse('admin_gestion_citas') + '?tab=anuncios')
+
+
+@csrf_protect
+def update_Directo(request: HttpRequest) -> HttpResponse:
+    if request.method == 'POST':
+        # Nota: Aquí usarías request.POST.get() si el frontend usa un formulario tradicional
+        # o request.body/json.loads() si sigue usando AJAX pero la quieres redirigir.
+        
+        # Asumiendo que has ajustado el frontend para enviar como formulario POST tradicional:
+        text = request.POST.get('message_text', '').strip()
+        url = request.POST.get('message_url', '').strip() 
+
+        if not text:
+            messages.error(request, 'El mensaje de cabecera no puede estar vacío.')
+            return redirect('home')
+        
+        if not url:
+            messages.error(request, 'La url no puede estar vacío.')
+            return redirect('home')
+        
+        try:
+            # Lógica para desactivar y crear/actualizar el mensaje (igual que antes)
+            Directo.objects.filter(is_active=True).update(is_active=False)
+            Directo.objects.create(text=text, url=url, is_active=True)
+            
+            messages.success(request, 'Mensaje de cabecera actualizado correctamente.')
+            
+        except Exception as e:
+            messages.error(request, f'Error al guardar el mensaje: {str(e)}')
+            
+        return redirect('home') # Forzar recarga completa de la página de inicio
+    
+    # Si alguien intenta acceder con GET, redirigir al inicio
+    return redirect('home')
+
+
+@csrf_protect
+def delete_Directo(request: HttpRequest) -> HttpResponse:
+    if request.method == 'POST':
+        try:
+            message = Directo.objects.filter(is_active=True).first()
+            
+            if message:
+                message.is_active = False
+                message.save()
+                messages.success(request, 'Mensaje de cabecera eliminado correctamente.')
+            else:
+                messages.info(request, 'No había ningún mensaje activo que eliminar.')
+                
+        except Exception as e:
+            messages.error(request, f'Error al eliminar el mensaje: {str(e)}')
+            
+        return redirect('home') # Forzar recarga completa de la página de inicio
+
+    return redirect('home')
+
+
+# --- FUNCIÓN DE AYUDA PARA EL CONTEXTO DIRECTO (HELPER) ---
+def get_directo_context():
+    """Busca el mensaje de directo activo para pasarlo al contexto."""
+    try:
+        current_directo = Directo.objects.filter(is_active=True).first()
+    except Exception:
+        current_directo = None
+        
+    return {'current_directo': current_directo}

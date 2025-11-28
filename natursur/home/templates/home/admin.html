@@ -360,11 +360,83 @@
                     </div>
                 </div>
 
-                <!-- Sección: Anuncios -->
+                <!-- Sección: Promociones -->
                 <div id="seccion-anuncios" class="seccion-contenido hidden">
-                    <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/50">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-8">Anuncios y Promociones</h2>
-                        <p class="text-gray-600">Contenido de anuncios aquí...</p>
+                    <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/50 min-h-[500px]">
+                        
+                        <!-- Header de Promociones con Botón Flotante -->
+                        <div class="flex justify-between items-center mb-8">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900">Anuncios y Promociones</h2>
+                                <p class="text-gray-500 text-sm">Gestiona las ofertas activas en la web</p>
+                            </div>
+                            
+                            <!-- TU BOTÓN PERSONALIZADO (Abre el modal) -->
+                            <button onclick="document.getElementById('modal-crear-promo').classList.remove('hidden')" 
+                                    class="flex items-center justify-center w-12 h-12 text-[#00A69A] hover:text-white hover:bg-[#00A69A] border border-[#00A69A] rounded-full transition duration-200 shadow-sm hover:shadow-md group" 
+                                    title="Crear Nueva Promoción">
+                                <svg class="w-6 h-6 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Lista de Promociones -->
+                        <div class="space-y-4">
+                            {% for promo in promociones %}
+                            <!-- Tarjeta de Promoción (Estilo Tailwind) -->
+                            <div class="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                
+                                <!-- Info Izquierda -->
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0 text-green-600">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-gray-900">{{ promo.nombre }}</h3>
+                                        <div class="flex flex-wrap gap-2 text-sm mt-1">
+                                            <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-lg font-medium text-xs border border-green-200">
+                                                {{ promo.descripcion }}
+                                            </span>
+                                            <span class="text-gray-400 flex items-center gap-1 text-xs">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                {{ promo.fecha_inicio|date:"d M" }} - {{ promo.fecha_fin|date:"d M Y" }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Controles Derecha -->
+                                <div class="flex items-center gap-4 w-full sm:w-auto justify-end">
+                                    <!-- Toggle Switch (Tailwind) -->
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer toggle-promo" data-id="{{ promo.id }}" {% if promo.activa %}checked{% endif %}>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00A69A]"></div>
+                                    </label>
+                                    
+                                    <div class="h-8 w-px bg-gray-200 mx-1"></div>
+
+                                    <form method="POST" action="{% url 'eliminar_promocion' promo.id %}" onsubmit="return confirm('¿Seguro que quieres eliminar esta promoción?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50" title="Eliminar">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-10 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50">
+                                <div class="text-4xl mb-3 opacity-50">🏷️</div>
+                                <p class="text-gray-500 font-medium">No hay promociones activas</p>
+                                <button onclick="document.getElementById('modal-crear-promo').classList.remove('hidden')" class="text-[#00A69A] font-semibold text-sm hover:underline mt-2">
+                                    Crear la primera ahora
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+
                     </div>
                 </div>
 
@@ -372,6 +444,154 @@
         </div>
     </div>
 </div>
+
+<!-- ========================================== -->
+<!--       MODAL FLOTANTE (CREAR PROMO)         -->
+<!-- ========================================== -->
+<div id="modal-crear-promo" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300">
+    <div class="relative mx-auto p-0 border w-full max-w-lg shadow-2xl rounded-2xl bg-white transform transition-all scale-100">
+        
+        <!-- Header Modal -->
+        <div class="bg-gradient-to-r from-[#00A69A] to-teal-600 px-6 py-4 rounded-t-2xl flex justify-between items-center">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                Nueva Promoción
+            </h3>
+            <button onclick="document.getElementById('modal-crear-promo').classList.add('hidden')" class="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-1 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- Body Modal -->
+        <div class="p-6">
+            <form id="form-crear-promo" action="{% url 'crear_promocion' %}" method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Nombre de la Promoción</label>
+                    <input type="text" name="nombre" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00A69A] focus:border-transparent transition-all" placeholder="Ej. Descuento Verano" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Descripción del Descuento</label>
+                    <input type="text" name="descripcion" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00A69A] focus:border-transparent transition-all" placeholder="Ej. 15% OFF" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Desde</label>
+                        <input type="date" name="fecha_inicio" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00A69A] transition-all" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Hasta</label>
+                        <input type="date" name="fecha_fin" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00A69A] transition-all" required>
+                    </div>
+                </div>
+
+                <div class="flex items-center mb-6 bg-gray-50 p-3 rounded-xl">
+                    <input id="activaCheck" type="checkbox" name="activa" class="w-5 h-5 text-[#00A69A] rounded focus:ring-[#00A69A] border-gray-300" checked>
+                    <label for="activaCheck" class="ml-3 text-sm font-medium text-gray-700">Activar inmediatamente</label>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('modal-crear-promo').classList.add('hidden')" class="px-5 py-2.5 rounded-xl text-gray-500 hover:bg-gray-100 font-semibold transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#00A69A] hover:bg-teal-700 text-white font-bold shadow-md hover:shadow-lg transform active:scale-95 transition-all">
+                        Crear Promoción
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .seccion-contenido {
+        transition: all 0.3s ease-in-out;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // TABS LOGIC
+        const seccionBtns = document.querySelectorAll('.seccion-btn');
+        const secciones = document.querySelectorAll('.seccion-contenido');
+        
+        function mostrarSeccion(seccionId) {
+            secciones.forEach(seccion => seccion.classList.add('hidden'));
+            const seccionActiva = document.getElementById(`seccion-${seccionId}`);
+            if (seccionActiva) seccionActiva.classList.remove('hidden');
+            
+            seccionBtns.forEach(btn => {
+                btn.classList.remove('bg-gradient-to-r', 'from-blue-50', 'to-blue-100/50', 'border-blue-200', 'text-blue-700');
+                btn.classList.add('text-gray-600', 'hover:bg-gray-50/80');
+            });
+            
+            const btnActivo = document.querySelector(`[data-seccion="${seccionId}"]`);
+            if (btnActivo) {
+                btnActivo.classList.remove('text-gray-600', 'hover:bg-gray-50/80');
+                btnActivo.classList.add('bg-gradient-to-r', 'from-blue-50', 'to-blue-100/50', 'border-blue-200', 'text-blue-700');
+            }
+        }
+        
+        seccionBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const seccionId = this.getAttribute('data-seccion');
+                mostrarSeccion(seccionId);
+            });
+        });
+
+        // Recuperar pestaña activa si recargamos la página (útil para el form submit)
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.get('tab') === 'anuncios'){
+             mostrarSeccion('anuncios');
+        } else {
+             mostrarSeccion('mi-perfil');
+        }
+
+        // TOGGLE SWITCH LOGIC (AJAX)
+        document.querySelectorAll('.toggle-promo').forEach(switchInput => {
+            switchInput.addEventListener('change', function() {
+                const promoId = this.dataset.id;
+                fetch(`/promociones/toggle/${promoId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                });
+            });
+        });
+
+        // FORMULARIO MODAL LOGIC (Para no redirigir lejos)
+        const form = document.getElementById('form-crear-promo');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Evita el submit tradicional
+            
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest' // Importante para que Django sepa que es AJAX
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'ok') {
+                    // Cerrar modal y recargar página en la misma pestaña
+                    document.getElementById('modal-crear-promo').classList.add('hidden');
+                    window.location.href = window.location.pathname + "?tab=anuncios"; 
+                } else {
+                    alert('Error al crear: ' + JSON.stringify(data.errors));
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
 
 <style>
     .seccion-contenido {
@@ -419,8 +639,17 @@
             });
         });
         
-        // Mostrar sección inicial (Mi Perfil)
-        mostrarSeccion('mi-perfil');
+        // 4. LÓGICA DE INICIO INTELIGENTE (LA CORRECCIÓN)
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab'); // Leemos ?tab=anuncios
+
+        if (tabParam === 'anuncios') {
+            mostrarSeccion('anuncios'); // <--- Va directo a anuncios si la URL lo dice
+        } else if (tabParam === 'gestion-citas') {
+            mostrarSeccion('gestion-citas');
+        } else {
+            mostrarSeccion('mi-perfil'); // Solo va a perfil si NO hay parámetros
+        }
     });
 </script>
 {% endblock %}

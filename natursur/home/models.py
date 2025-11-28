@@ -41,3 +41,37 @@ class Cita(models.Model):
 
     def __str__(self):
         return f"{self.tipo} - {self.fecha} ({self.user.username})"
+
+class Producto(models.Model):
+    nombre = models.CharField(max_length=255)
+    precio = models.CharField(max_length=50)  # Lo guardamos como texto por formatos “37,92 €”
+    
+    img_url = models.URLField(max_length=500, blank=True, null=True)
+    link = models.URLField(max_length=500, blank=True, null=True)
+
+    def __str__(self):
+        return self.nombre
+    
+
+class Promocion(models.Model):
+    nombre = models.CharField(max_length=100, verbose_name="Nombre de la promoción")
+    descripcion = models.CharField(max_length=200, verbose_name="Descripción del descuento (ej. 10%)")
+    fecha_inicio = models.DateField(verbose_name="Vigencia Desde")
+    fecha_fin = models.DateField(verbose_name="Vigencia Hasta")
+    activa = models.BooleanField(default=True, verbose_name="¿Activa?")
+
+    def __str__(self):
+        return self.nombre
+    
+
+    
+class Directo(models.Model):
+    """
+    Modelo para almacenar el mensaje que se muestra globalmente en la cabecera.
+    """
+    text = models.CharField(max_length=255, verbose_name="Mensaje de cabecera")
+    url = models.URLField(max_length=200, blank=True, null=True, verbose_name="Hipervínculo (opcional)")
+    is_active = models.BooleanField(default=False, verbose_name="¿Activo para mostrar?")
+    
+    def __str__(self):
+        return self.text

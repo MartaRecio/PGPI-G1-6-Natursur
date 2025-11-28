@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Productos | Natursur{% endblock %}
+
+{% block content %}
+
+<section class="py-20 bg-white shadow-md">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+        <h1 class="text-5xl font-extrabold text-[#126853] mb-4">
+            Productos Naturales
+        </h1>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Descubre nuestra selección de productos naturales, cuidadosamente elegidos para tu bienestar.
+        </p>
+    </div>
+</section>
+
+<section class="py-16 bg-light-background">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center text-corporate-green mb-12">
+            Nuestra Tienda
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
+
+            {% for producto in productos %}
+            <a href="{{ producto.link }}" target="_blank" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 border-t-4 border-corporate-green flex flex-col h-full">
+                
+                <!-- Imagen -->
+                <div class="mb-4">
+                    <img src="{{ producto.img_url }}" alt="{{ producto.nombre }}" class="w-full h-56 object-contain mx-auto"/>
+                </div>
+
+                <!-- Nombre del producto -->
+                <h3 class="text-2xl font-bold text-[#126853] mb-2 text-center">
+                    {{ producto.nombre }}
+                </h3>
+
+                <!-- Contenedor para precio y botón siempre abajo -->
+                <div class="mt-auto text-center flex flex-col gap-3">
+                    <p class="text-gray-600 font-semibold text-lg">
+                        {{ producto.precio }}
+                    </p>
+                    <span class="inline-block px-6 py-2 border border-button-turquesa text-button-turquesa font-semibold rounded-full hover:bg-button-turquesa hover:text-white transition duration-300">
+                        Ver Producto
+                    </span>
+                </div>
+            </a>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+<section class="py-16 bg-corporate-green text-green">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-extrabold mb-3">
+            ¿Quieres más información?
+        </h2>
+        <p class="text-lg opacity-90 mb-8">
+            Contáctanos para descubrir más productos naturales que te ayudarán a cuidar tu bienestar.
+        </p>
+    </div>
+</section>
+
+{% endblock content %}
