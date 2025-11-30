@@ -17,6 +17,8 @@ Proyecto web para Natursur desarrollado en Django
 3. Activar entorno: `.\.venv\Scripts\activate.bat`
 4. Instalar Django: `python -m pip install Django`
 5. Instalar dependencias: `pip install -r requirements.txt`
+
+    --> Las siguientes desde natursur (cd natursur):
 6. Migrar base de datos: `python manage.py migrate`
 7. Ejecutar servidor: `python manage.py runserver`
 
@@ -35,7 +37,9 @@ Proyecto web para Natursur desarrollado en Django
 3. Hacer commits descriptivos (titulo corto pero claro)
 4. Subir cambios de la rama: `git push -u origin feature/nombre`
 5. Crear Pull Request para revisión (en GitHub)
-6. Fusionar con `main` después de aprobarse: `git checkout main`  --  `git merge feature/nombre-feature`
+6. Una vez asignada, revisada y aceptada por un miembro, se mergea a `develop`.
+7. Se comprueba que todo funciona correctamente (entrega definitiva).
+8. Fusionar con `main`: `git checkout main`  --  `git merge develop`
 
 
 ## 👥 Equipo

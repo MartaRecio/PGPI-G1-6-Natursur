@@ -1,0 +1,655 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel Admin - Natursur{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 py-8">
+    <div class="max-w-7xl mx-auto px-4">
+        
+        <!-- Header Principal -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent mb-3">
+                🌿 Panel Administrativo
+            </h1>
+            <p class="text-gray-600 text-lg">Gestión integral de citas y servicios Natursur</p>
+        </div>
+
+        <!-- Layout Principal -->
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- Sidebar Menu -->
+            <div class="lg:w-80 flex-shrink-0 -mt-20">
+                <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/50">
+                    <!-- Avatar y Info -->
+                    <div class="text-center mb-8">
+                        <div class="relative inline-block">
+                            <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-teal-400 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg mx-auto mb-3">
+                                {{ user.username|first|upper }}
+                            </div>
+                            <div class="absolute -bottom-2 -right-2 w-6 h-6 bg-green-400 border-4 border-white rounded-full"></div>
+                        </div>
+                        <h2 class="text-xl font-semibold text-gray-900">{{ user.username }}</h2>
+                        <p class="text-sm text-gray-500 mt-1">Administrador</p>
+                    </div>
+                    
+                    <!-- Menú Navegación -->
+                    <nav class="space-y-1">
+                        <button data-seccion="mi-perfil"
+                                class="w-full flex items-center space-x-4 p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-blue-100/50 border border-blue-200 text-blue-700 shadow-sm transition-all duration-300 hover:shadow-md group seccion-btn">
+                            <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                                👤
+                            </div>
+                            <span class="font-semibold">Mi Perfil</span>
+                        </button>
+                        
+                        <button data-seccion="gestion-citas"
+                                class="w-full flex items-center space-x-4 p-3 rounded-2xl text-gray-600 hover:bg-gray-50/80 border border-transparent hover:border-gray-200 transition-all duration-300 group seccion-btn">
+                            <div class="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                                📅
+                            </div>
+                            <span class="font-semibold">Gestión de Citas</span>
+                        </button>
+                        
+                        <button data-seccion="anuncios"
+                                class="w-full flex items-center space-x-4 p-3 rounded-2xl text-gray-600 hover:bg-gray-50/80 border border-transparent hover:border-gray-200 transition-all duration-300 group seccion-btn">
+                            <div class="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                                📢
+                            </div>
+                            <span class="font-semibold">Anuncios</span>
+                        </button>
+                    </nav>
+
+                    <!-- Stats Rápidas -->
+                    <div class="mt-2 pt-4 border-t border-gray-200/50">
+                        <div class="grid grid-cols-2 gap-3 text-center">
+                            <div class="bg-blue-50/50 rounded-xl p-3">
+                                <div class="text-2xl font-bold text-blue-600">{{ citas_hoy_count }}</div>
+                                <div class="text-xs text-blue-500 font-medium">Citas Hoy</div>
+                            </div>
+                            <div class="bg-purple-50/50 rounded-xl p-3">
+                                <div class="text-2xl font-bold text-purple-600">{{ citas_semana_count }}</div>
+                                <div class="text-xs text-purple-500 font-medium">Esta Semana</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="flex-1">
+                
+                <!-- Sección: Mi Perfil -->
+                <div id="seccion-mi-perfil" class="seccion-contenido">
+                    <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-white/50">
+                        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                            <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600">
+                                👤
+                            </div>
+                            Mi Perfil - Editar Información
+                        </h2>
+                        
+                        <div class="max-w-2xl">
+                            <!-- Formulario de Edición -->
+                            <form method="POST" action="{% url 'admin_editar_perfil' %}" class="space-y-4">
+                                {% csrf_token %}
+                                
+                                <!-- Username -->
+                                <div class="bg-gradient-to-r from-blue-50 to-transparent p-4 rounded-2xl border border-blue-100">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        👤 Nombre de Usuario
+                                    </label>
+                                    <input type="text"
+                                           name="username"
+                                           value="{{ user.username }}"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                           required>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="bg-gradient-to-r from-green-50 to-transparent p-4 rounded-2xl border border-green-100">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        📧 Correo Electrónico
+                                    </label>
+                                    <input type="email"
+                                           name="email"
+                                           value="{{ user.email }}"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200"
+                                           required>
+                                </div>
+
+                                <!-- Teléfono -->
+                                <div class="bg-gradient-to-r from-orange-50 to-transparent p-4 rounded-2xl border border-orange-100">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        📞 Teléfono (Opcional)
+                                    </label>
+                                    <input type="tel"
+                                           name="telefono"
+                                           value="{{ user.telefono|default:'' }}"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition duration-200"
+                                           placeholder="+34 XXX XXX XXX">
+                                </div>
+
+                                <!-- Botón Guardar -->
+                                <div class="flex justify-end pt-2">
+                                    <button type="submit"
+                                            class="bg-gradient-to-r from-blue-500 to-teal-500 text-white px-6 py-2 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105 shadow-sm">
+                                        💾 Guardar Cambios
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Cambiar Contraseña (FORMULARIO INCLUIDO) -->
+                            <div class="mt-6 pt-4 border-t border-gray-200">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-3">🔒 Cambiar Contraseña</h3>
+                                
+                                <form method="POST" action="{% url 'admin_cambiar_password' %}" class="bg-gradient-to-r from-red-50 to-transparent p-4 rounded-2xl border border-red-100">
+                                    {% csrf_token %}
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                                Contraseña Actual
+                                            </label>
+                                            <input type="password"
+                                                   name="current_password"
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                                                   required>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                                Nueva Contraseña
+                                            </label>
+                                            <input type="password"
+                                                   name="new_password"
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                                                   required>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                                Confirmar Nueva Contraseña
+                                            </label>
+                                            <input type="password"
+                                                   name="confirm_password"
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200"
+                                                   required>
+                                        </div>
+                                        <div class="flex justify-end">
+                                            <button type="submit"
+                                                    class="bg-gradient-to-r from-red-500 to-pink-500 text-white px-5 py-2 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105 shadow-sm">
+                                                🔄 Cambiar Contraseña
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="seccion-gestion-citas" class="seccion-contenido hidden transform scale-95 origin-top">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-3">
+                            <div class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600">
+                                📅
+                            </div>
+                            Gestión de Citas
+                        </h2>
+                        <div class="flex items-center gap-4">
+                            <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">
+                                {{ total_citas }} citas totales
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                            ⏰ Próxima Cita Programada
+                        </h3>
+                        
+                        {% if proxima_cita %}
+                        <div class="bg-gradient-to-br from-blue-500 via-blue-600 to-teal-500 rounded-2xl p-5 text-white shadow-2xl">
+                            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5">
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap items-center gap-3 mb-3">
+                                        <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold border border-white/30">
+                                            {{ proxima_cita.tipo }}
+                                        </span>
+                                        <span class="text-xl font-bold bg-white/10 px-3 py-1 rounded-xl border border-white/20">
+                                            {{ proxima_cita.fecha|date:"l, d F" }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="space-y-2">
+                                        <p class="text-2xl font-bold mb-3 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                                            {{ proxima_cita.fecha|date:"H:i" }} horas
+                                        </p>
+                                        <p class="flex items-center gap-2 text-blue-50">
+                                            <span class="bg-white/20 p-1 rounded-lg">👤</span>
+                                            <span class="font-semibold">{{ proxima_cita.user.username }}</span>
+                                        </p>
+                                        <p class="flex items-center gap-2 text-blue-50">
+                                            <span class="bg-white/20 p-1 rounded-lg">📧</span>
+                                            {{ proxima_cita.user.email }}
+                                        </p>
+                                        {% if proxima_cita.user.telefono %}
+                                        <p class="flex items-center gap-2 text-blue-50">
+                                            <span class="bg-white/20 p-1 rounded-lg">📞</span>
+                                            {{ proxima_cita.user.telefono }}
+                                        </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center lg:text-right space-y-3">
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-xl px-3 py-2 border border-white/30 text-center">
+                                        <div class="text-sm text-blue-100">Próxima cita</div>
+                                        <div class="text-lg font-bold text-white">{{ proxima_cita.dias_restantes }}</div>
+                                    </div>
+                                    <form method="POST" action="{% url 'admin_cancelar_cita' proxima_cita.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                onclick="return confirm('¿Cancelar la próxima cita programada?')"
+                                                class="bg-white text-blue-600 px-4 py-2 rounded-xl text-sm font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105 shadow-sm">
+                                            Cancelar Cita
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-6 bg-gradient-to-br from-gray-50 to-green-50/30 rounded-2xl border-2 border-dashed border-green-300">
+                            <div class="text-3xl mb-2">✅</div>
+                            <p class="text-gray-600 font-semibold">No hay próximas citas programadas</p>
+                            <p class="text-gray-400 text-sm mt-1">El calendario está libre por ahora</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl p-4 border border-blue-200">
+                            <div class="text-2xl font-bold text-blue-600 mb-1">{{ total_citas }}</div>
+                            <div class="text-sm text-blue-700 font-semibold">Total Citas</div>
+                        </div>
+                        <div class="bg-gradient-to-br from-green-50 to-green-100/50 rounded-2xl p-4 border border-green-200">
+                            <div class="text-2xl font-bold text-green-600 mb-1">{{ citas_hoy_count }}</div>
+                            <div class="text-sm text-green-700 font-semibold">Citas Hoy</div>
+                        </div>
+                        <div class="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-2xl p-4 border border-purple-200">
+                            <div class="text-2xl font-bold text-purple-600 mb-1">{{ citas_semana_count }}</div>
+                            <div class="text-sm text-purple-700 font-semibold">Esta Semana</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            📋 Todas las Citas Programadas
+                        </h3>
+
+                        <div class="space-y-3">
+                            {% for cita in citas %}
+                            <div class="bg-gradient-to-r from-white to-gray-50/50 border border-gray-200/80 rounded-2xl p-5 hover:shadow-lg transition-all duration-300 hover:border-purple-200/50 group">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                                            <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full text-sm font-semibold shadow-sm">
+                                                {{ cita.tipo }}
+                                            </span>
+                                            <span class="text-lg font-bold text-gray-900 bg-white px-2 py-1 rounded-xl border">
+                                                {{ cita.fecha|date:"d/m H:i" }}
+                                            </span>
+                                            {% if cita.es_hoy %}
+                                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold border border-green-200">
+                                                🎯 Hoy
+                                            </span>
+                                            {% elif cita.es_manana %}
+                                            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-semibold border border-blue-200">
+                                                📍 Mañana
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                            <div class="space-y-1">
+                                                <p class="text-gray-600 flex items-center gap-2">
+                                                    <span class="w-5 h-5 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">👤</span>
+                                                    <span class="font-semibold text-gray-900">{{ cita.user.username }}</span>
+                                                </p>
+                                                <p class="text-gray-600 flex items-center gap-2">
+                                                    <span class="w-5 h-5 bg-green-100 rounded-lg flex items-center justify-center text-green-600">📧</span>
+                                                    {{ cita.user.email }}
+                                                </p>
+                                            </div>
+                                            <div class="space-y-1">
+                                                {% if cita.user.telefono %}
+                                                <p class="text-gray-600 flex items-center gap-2">
+                                                    <span class="w-5 h-5 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600">📞</span>
+                                                    {{ cita.user.telefono }}
+                                                </p>
+                                                {% endif %}
+                                                <p class="text-gray-600 flex items-center gap-2">
+                                                    <span class="w-5 h-5 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600">🆔</span>
+                                                    #{{ cita.id }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <form method="POST" action="{% url 'admin_cancelar_cita' cita.id %}" class="flex-shrink-0">
+                                        {% csrf_token %}
+                                        {% if cita.es_futura %}
+                                        <button type="submit"
+                                                onclick="return confirm('¿Cancelar cita de {{ cita.user.username }}?')"
+                                                class="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105 shadow-sm group-hover:shadow-md">
+                                            Cancelar
+                                        </button>
+                                        {% else %}
+                                        <div class="bg-gray-300 text-gray-500 px-4 py-2 rounded-xl text-sm font-semibold cursor-not-allowed">
+                                            Finalizada
+                                        </div>
+                                        {% endif %}
+                                    </form>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-8 bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-2xl border-2 border-dashed border-gray-300">
+                                <div class="text-4xl mb-3">📭</div>
+                                <p class="text-gray-500 font-semibold">No hay citas programadas</p>
+                                <p class="text-gray-400 text-sm mt-1">Todavía no hay citas en el sistema</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección: Promociones -->
+                <div id="seccion-anuncios" class="seccion-contenido hidden">
+                    <div class="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-white/50 min-h-[500px]">
+                        
+                        <!-- Header de Promociones con Botón Flotante -->
+                        <div class="flex justify-between items-center mb-8">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900">Anuncios y Promociones</h2>
+                                <p class="text-gray-500 text-sm">Gestiona las ofertas activas en la web</p>
+                            </div>
+                            
+                            <!-- TU BOTÓN PERSONALIZADO (Abre el modal) -->
+                            <button onclick="document.getElementById('modal-crear-promo').classList.remove('hidden')" 
+                                    class="flex items-center justify-center w-12 h-12 text-[#00A69A] hover:text-white hover:bg-[#00A69A] border border-[#00A69A] rounded-full transition duration-200 shadow-sm hover:shadow-md group" 
+                                    title="Crear Nueva Promoción">
+                                <svg class="w-6 h-6 transform group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Lista de Promociones -->
+                        <div class="space-y-4">
+                            {% for promo in promociones %}
+                            <!-- Tarjeta de Promoción (Estilo Tailwind) -->
+                            <div class="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                
+                                <!-- Info Izquierda -->
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0 text-green-600">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-gray-900">{{ promo.nombre }}</h3>
+                                        <div class="flex flex-wrap gap-2 text-sm mt-1">
+                                            <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-lg font-medium text-xs border border-green-200">
+                                                {{ promo.descripcion }}
+                                            </span>
+                                            <span class="text-gray-400 flex items-center gap-1 text-xs">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                {{ promo.fecha_inicio|date:"d M" }} - {{ promo.fecha_fin|date:"d M Y" }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Controles Derecha -->
+                                <div class="flex items-center gap-4 w-full sm:w-auto justify-end">
+                                    <!-- Toggle Switch (Tailwind) -->
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer toggle-promo" data-id="{{ promo.id }}" {% if promo.activa %}checked{% endif %}>
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00A69A]"></div>
+                                    </label>
+                                    
+                                    <div class="h-8 w-px bg-gray-200 mx-1"></div>
+
+                                    <form method="POST" action="{% url 'eliminar_promocion' promo.id %}" onsubmit="return confirm('¿Seguro que quieres eliminar esta promoción?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50" title="Eliminar">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-10 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50">
+                                <div class="text-4xl mb-3 opacity-50">🏷️</div>
+                                <p class="text-gray-500 font-medium">No hay promociones activas</p>
+                                <button onclick="document.getElementById('modal-crear-promo').classList.remove('hidden')" class="text-[#00A69A] font-semibold text-sm hover:underline mt-2">
+                                    Crear la primera ahora
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!--       MODAL FLOTANTE (CREAR PROMO)         -->
+<!-- ========================================== -->
+<div id="modal-crear-promo" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300">
+    <div class="relative mx-auto p-0 border w-full max-w-lg shadow-2xl rounded-2xl bg-white transform transition-all scale-100">
+        
+        <!-- Header Modal -->
+        <div class="bg-gradient-to-r from-[#00A69A] to-teal-600 px-6 py-4 rounded-t-2xl flex justify-between items-center">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                Nueva Promoción
+            </h3>
+            <button onclick="document.getElementById('modal-crear-promo').classList.add('hidden')" class="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-1 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- Body Modal -->
+        <div class="p-6">
+            <form id="form-crear-promo" action="{% url 'crear_promocion' %}" method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Nombre de la Promoción</label>
+                    <input type="text" name="nombre" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00A69A] focus:border-transparent transition-all" placeholder="Ej. Descuento Verano" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Descripción del Descuento</label>
+                    <input type="text" name="descripcion" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00A69A] focus:border-transparent transition-all" placeholder="Ej. 15% OFF" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Desde</label>
+                        <input type="date" name="fecha_inicio" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00A69A] transition-all" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Hasta</label>
+                        <input type="date" name="fecha_fin" class="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00A69A] transition-all" required>
+                    </div>
+                </div>
+
+                <div class="flex items-center mb-6 bg-gray-50 p-3 rounded-xl">
+                    <input id="activaCheck" type="checkbox" name="activa" class="w-5 h-5 text-[#00A69A] rounded focus:ring-[#00A69A] border-gray-300" checked>
+                    <label for="activaCheck" class="ml-3 text-sm font-medium text-gray-700">Activar inmediatamente</label>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('modal-crear-promo').classList.add('hidden')" class="px-5 py-2.5 rounded-xl text-gray-500 hover:bg-gray-100 font-semibold transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#00A69A] hover:bg-teal-700 text-white font-bold shadow-md hover:shadow-lg transform active:scale-95 transition-all">
+                        Crear Promoción
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .seccion-contenido {
+        transition: all 0.3s ease-in-out;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // TABS LOGIC
+        const seccionBtns = document.querySelectorAll('.seccion-btn');
+        const secciones = document.querySelectorAll('.seccion-contenido');
+        
+        function mostrarSeccion(seccionId) {
+            secciones.forEach(seccion => seccion.classList.add('hidden'));
+            const seccionActiva = document.getElementById(`seccion-${seccionId}`);
+            if (seccionActiva) seccionActiva.classList.remove('hidden');
+            
+            seccionBtns.forEach(btn => {
+                btn.classList.remove('bg-gradient-to-r', 'from-blue-50', 'to-blue-100/50', 'border-blue-200', 'text-blue-700');
+                btn.classList.add('text-gray-600', 'hover:bg-gray-50/80');
+            });
+            
+            const btnActivo = document.querySelector(`[data-seccion="${seccionId}"]`);
+            if (btnActivo) {
+                btnActivo.classList.remove('text-gray-600', 'hover:bg-gray-50/80');
+                btnActivo.classList.add('bg-gradient-to-r', 'from-blue-50', 'to-blue-100/50', 'border-blue-200', 'text-blue-700');
+            }
+        }
+        
+        seccionBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const seccionId = this.getAttribute('data-seccion');
+                mostrarSeccion(seccionId);
+            });
+        });
+
+        // Recuperar pestaña activa si recargamos la página (útil para el form submit)
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.get('tab') === 'anuncios'){
+             mostrarSeccion('anuncios');
+        } else {
+             mostrarSeccion('mi-perfil');
+        }
+
+        // TOGGLE SWITCH LOGIC (AJAX)
+        document.querySelectorAll('.toggle-promo').forEach(switchInput => {
+            switchInput.addEventListener('change', function() {
+                const promoId = this.dataset.id;
+                fetch(`/promociones/toggle/${promoId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                });
+            });
+        });
+
+        // FORMULARIO MODAL LOGIC (Para no redirigir lejos)
+        const form = document.getElementById('form-crear-promo');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Evita el submit tradicional
+            
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest' // Importante para que Django sepa que es AJAX
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'ok') {
+                    // Cerrar modal y recargar página en la misma pestaña
+                    document.getElementById('modal-crear-promo').classList.add('hidden');
+                    window.location.href = window.location.pathname + "?tab=anuncios"; 
+                } else {
+                    alert('Error al crear: ' + JSON.stringify(data.errors));
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+</script>
+
+<style>
+    .seccion-contenido {
+        transition: all 0.3s ease-in-out;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const seccionBtns = document.querySelectorAll('.seccion-btn');
+        const secciones = document.querySelectorAll('.seccion-contenido');
+        
+        // Función para mostrar una sección y ocultar las demás
+        function mostrarSeccion(seccionId) {
+            // Ocultar todas las secciones
+            secciones.forEach(seccion => {
+                seccion.classList.add('hidden');
+            });
+            
+            // Mostrar la sección seleccionada
+            const seccionActiva = document.getElementById(`seccion-${seccionId}`);
+            if (seccionActiva) {
+                seccionActiva.classList.remove('hidden');
+            }
+            
+            // Actualizar botones activos
+            seccionBtns.forEach(btn => {
+                btn.classList.remove('bg-gradient-to-r', 'from-blue-50', 'to-blue-100/50', 'border-blue-200', 'text-blue-700');
+                btn.classList.add('text-gray-600', 'hover:bg-gray-50/80');
+            });
+            
+            // Activar el botón clickeado
+            const btnActivo = document.querySelector(`[data-seccion="${seccionId}"]`);
+            if (btnActivo) {
+                btnActivo.classList.remove('text-gray-600', 'hover:bg-gray-50/80');
+                btnActivo.classList.add('bg-gradient-to-r', 'from-blue-50', 'to-blue-100/50', 'border-blue-200', 'text-blue-700');
+            }
+        }
+        
+        // Event listeners para los botones
+        seccionBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const seccionId = this.getAttribute('data-seccion');
+                mostrarSeccion(seccionId);
+            });
+        });
+        
+        // 4. LÓGICA DE INICIO INTELIGENTE (LA CORRECCIÓN)
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab'); // Leemos ?tab=anuncios
+
+        if (tabParam === 'anuncios') {
+            mostrarSeccion('anuncios'); // <--- Va directo a anuncios si la URL lo dice
+        } else if (tabParam === 'gestion-citas') {
+            mostrarSeccion('gestion-citas');
+        } else {
+            mostrarSeccion('mi-perfil'); // Solo va a perfil si NO hay parámetros
+        }
+    });
+</script>
+{% endblock %}

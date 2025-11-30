@@ -1,0 +1,815 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Natursur | Sostenibilidad y Bienestar{% endblock %}</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Paleta de Colores Natursur - AJUSTADO AL DISEÑO DEL HEADER */
+        :root {
+            --color-corporate-green: #3D9140; /* Verde más vivo */
+            --color-light-background: #F7F5F0; 
+            --color-button-turquesa: #00A69A; /* Color del botón "RESERVA TU CITA" */
+            --color-text-dark: #333333;
+            --color-dark-teal: #0c4143;
+            --color-calendar-green: #006b5f;
+        }
+        .bg-button-turquesa { background-color: var(--color-button-turquesa); }
+        .text-corporate-green { color: var(--color-corporate-green); }
+        .text-button-turquesa { color: var(--color-button-turquesa); }
+        .bg-dark-teal { background-color: var(--color-dark-teal); }
+        .border-button-turquesa { border-color: var(--color-button-turquesa); }
+        .bg-calendly-green { background-color: var(--color-calendar-green); }
+        .text-calendly-green { color: var(--color-calendar-green); }
+        .border-calendly-green { border-color: var(--color-calendar-green); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--color-text-dark);
+            background-color: var(--color-light-background);
+        }
+        .nav-link {
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            color: #167a69;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: var(--color-button-turquesa);
+        }
+        .hover\:bg-calendly-green:hover {
+            background-color: #006b5f;
+        }
+        .transition-smooth {
+            transition: all 0.2s ease-in-out;
+        }
+        .calendar-day {
+            transition: all 0.2s ease-in-out;
+        }
+        .calendar-day:hover {
+            transform: scale(1.05);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- HEADER & NAVEGACIÓN -->
+    <header class="shadow-sm sticky top-0 z-50 bg-white border-b border-gray-100">
+        <div class="w-full px-6 py-6 flex justify-between items-center h-32">
+            
+            <!-- COLUMNA 1: LOGO  -->
+            <div class="flex items-center flex-none ml-8">
+                <a href="{% url 'home' %}" class="flex items-center">
+                    <img src="{% static 'home/img/logo_natursur.png' %}"
+                         alt="Natursur Logo Completo"
+                         class="h-25 w-auto">
+                </a>
+            </div>
+
+
+            <!-- COLUMNA INTERMEDIA: DIRECTO -->
+            <div id="directo-container" class="flex items-center justify-center flex-grow">
+                {% if current_directo %}
+                    
+                    <!-- BOTÓN DEL ENLACE (Visible para todos) -->
+                    <a href="{{ current_directo.url }}" 
+                    target="_blank" 
+                    class="px-6 py-3 bg-[#DC2626] text-white font-bold text-sm rounded-lg shadow-lg hover:bg-opacity-90 transition duration-200 uppercase whitespace-nowrap mr-2">
+                        {{ current_directo.text }}
+                    </a>
+                    
+                    <!-- BOTÓN ELIMINAR (Solo Superuser) -->
+                    {% if user.is_superuser %}
+                    <form id="delete-form" method="POST" action="{% url 'delete_Directo' %}" class="flex items-center ml-0" onsubmit="document.getElementById('delete-message-btn').disabled = true;">
+                        {% csrf_token %}
+                        
+                        <button type="submit" id="delete-message-btn" 
+                                class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-500 rounded-full transition duration-200" 
+                                title="Eliminar mensaje">
+                            <span style="font-size: 1.5rem; line-height: 1;">🗑️</span>
+                        </button>
+                    </form>
+                    {% endif %}
+
+                {% else %}
+                    
+                    <!-- BOTÓN AÑADIR (Solo Superuser) -->
+                    {% if user.is_superuser %}
+                    <button id="add-message-btn" class="px-6 py-3 bg-button-turquesa text-white font-bold text-sm rounded-lg shadow-lg hover:bg-opacity-90 transition duration-200 uppercase whitespace-nowrap ml-8" onclick="openModal()">
+                        Añadir Directo
+                    </button>
+                    {% endif %}
+
+                {% endif %}
+            </div>
+
+            <!-- COLUMNA 2: MENÚ DE NAVEGACIÓN  -->
+            <div class="flex items-center justify-end flex-none space-x-8">
+                <nav class="hidden lg:flex justify-center items-center text-base font-semibold uppercase space-x-6">
+                    <!-- Enlaces del menú principal -->
+                    <a href="{% url 'home' %}" class="font-semibold text-green-800 hover:text-button-turquesa transition duration-300">Inicio</a>
+                    <a href="{% url 'services' %}" class="nav-link">Servicios</a>
+                    <a href="{% url 'lista_productos' %}" class="nav-link">Productos</a>
+                    <a href="#contact-info" class="nav-link">Contacto</a>
+                </nav>
+
+                <!-- BOTÓN LOGIN -->
+                {% if user.is_authenticated %}
+                    <!-- Estado: Usuario logueado -->
+                    <div class="hidden lg:flex items-center space-x-3 cursor-pointer group relative" id="userDropdown">
+                        <div class="flex items-center space-x-4 bg-white/10 hover:bg-white/20 rounded-full px-8 py-2 transition duration-300">
+                            <div class="relative">
+                                <!-- Círculo de sombra detrás -->
+                                <div class="absolute w-11 h-11 rounded-full bg-gray-200 -top-1 -left-1 -z-10"></div>
+                                <!-- Círculo principal -->
+                                <div class="w-9 h-9 rounded-full bg-[#4da8a0] flex items-center justify-center text-white font-normal text-base shrink-0 relative">
+                                    {{ user.username|first|upper }}
+                                </div>
+                            </div>
+                            <span class="text-[#00857A] font-medium whitespace-nowrap">¡Hola, {{ user.username }}!</span>
+                        </div>
+                        
+                        <!-- Dropdown menu  -->
+                        <div class="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                            <a href="{% if user.is_superuser %}{% url 'admin_editar_perfil' %}{% else %}{% url 'perfil' %}{% endif %}" " class="block px-4 py-3 text-gray-700 hover:bg-gray-100 transition duration-200">
+                                Mi Perfil
+                            </a>
+                            <div class="border-t border-gray-200"></div>
+                            <a href="{% url 'logout' %}" class="block px-4 py-3 text-red-600 hover:bg-gray-100 transition duration-200">
+                                Cerrar Sesión
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Estado: Usuario no logueado -->
+                    <a href="#" class="hidden lg:flex items-center justify-center w-10 h-10 text-[#00A69A] hover:text-white hover:bg-[#00A69A] border border-[#00A69A] rounded-full transition duration-200" data-open-login>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </a>
+                {% endif %}
+
+                <!-- Botón de Reserva -->
+                {% if user.is_authenticated %}
+                    <a href="{% url 'calendario' %}"
+                    target="_blank"
+                    class="px-6 py-3 bg-button-turquesa text-white font-bold text-sm rounded-lg shadow-lg hover:bg-opacity-90 transition duration-200 uppercase whitespace-nowrap ml-8">
+                        Reserva tu cita
+                    </a>
+                {% else %}
+                    <button onclick="openLoginModal()"
+                            class="px-6 py-3 bg-button-turquesa text-white font-bold text-sm rounded-lg shadow-lg hover:bg-opacity-90 transition duration-200 uppercase whitespace-nowrap ml-8">
+                        Reserva tu cita
+                    </button>
+                {% endif %}
+
+
+                <!-- Botón de Menú -->
+                <button id="mobile-menu-button" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition duration-300 text-corporate-green ml-4">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+        
+            <!-- MENÚ MÓVIL DESPLEGABLE -->
+            <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-gray-200 shadow-lg w-full absolute left-0 top-full">
+                <div class="container mx-auto">
+                    <a href="{% url 'home' %}" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200">INICIO</a>
+                    <a href="{% url 'services' %}" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200">SERVICIOS</a>
+                    <a href="#contact-info" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200">CONTACTO</a>
+                    <!-- LOGIN EN MÓVIL -->
+                    {% if user.is_authenticated %}
+                        <!-- Estado móvil: Usuario logueado -->
+                        <a href="{% if user.is_superuser %}{% url 'admin_editar_perfil' %}{% else %}{% url 'perfil' %}{% endif %}" class="block py-4 px-6 border-b bg-[#cce7e5] hover:bg-[#00A69A] hover:text-white text-[#00857A] font-semibold transition duration-200">MI PERFIL</a>
+                        <a href="{% url 'logout' %}" class="block py-4 px-6 border-b bg-[#fee] hover:bg-red-600 hover:text-white text-red-600 transition duration-200">CERRAR SESIÓN</a>
+                    {% else %}
+                        <!-- Estado móvil: Usuario no logueado -->
+                        <a href="#" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200" data-open-login>
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                <span>INICIAR SESIÓN</span>
+                            </div>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div id="promocion-modal" 
+                class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+                
+                <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-95 opacity-0"
+                    id="promocion-modal-content">
+                    
+                    <div class="bg-[#126853] text-white p-6 rounded-t-2xl">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold">Añadir Promoción</h3>
+                            <button type="button" class="text-white hover:text-gray-200 text-2xl" onclick="closeModal()">
+                                &times;
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="update-form" method="POST" action="{% url 'update_Directo' %}" class="p-6 space-y-4">
+                        {% csrf_token %}
+                        <div>
+                            <label for="message-text" class="block text-sm font-medium text-gray-700 mb-2">Mensaje a mostrar</label>
+                            <input 
+                                type="text" 
+                                name="message_text" 
+                                id="message-text"
+                                placeholder="Introduce el mensaje de promoción" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-button-turquesa"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label for="message-url" class="block text-sm font-medium text-gray-700 mb-2">Hipervínculo</label>
+                            <input 
+                                type="url" 
+                                name="message_url" 
+                                id="message-url"
+                                placeholder="URL de destino" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-button-turquesa"
+                            />
+                        </div>
+                        
+                        <div class="flex justify-end pt-4">
+                            <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2 hover:bg-gray-600 transition" onclick="closeModal()">Cancelar</button>
+                            <button type="submit" class="px-4 py-2 bg-button-turquesa text-white rounded-lg hover:bg-opacity-90 transition">Guardar</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+    </header>
+
+    <!-- BLOQUE DE CONTENIDO ÚNICO -->
+    <main class="flex-grow">
+        {% comment %} Bloque para mostrar mensajes de Django (éxito, error, etc.) {% endcomment %}
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 mt-4">
+            {% for message in messages %}
+            <div class="p-4 rounded-lg text-sm mb-3 
+                        {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-300
+                        {% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-300
+                        {% else %}bg-blue-100 text-blue-800 border border-blue-300{% endif %}" 
+                 role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% block content %}
+        {% endblock content %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-white pt-12 pb-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-xl font-bold mb-4 text-corporate-green">NATURSUR</h3>
+                <p class="text-gray-400 text-sm">Cuerpo, mente y alimentación: cuando los tres están en equilibrio, todo cambia.</p>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4 border-b border-corporate-green pb-2">Mapa Web</h4>
+                <ul class="space-y-2 text-sm text-gray-400">
+                    <li><a href="{% url 'home' %}" class="hover:text-corporate-green transition duration-300">Inicio</a></li>
+                    <li><a href="{% url 'services' %}" class="hover:text-corporate-green transition duration-300">Servicios</a></li>
+                    <li><a href="{% url 'lista_productos' %}" class="hover:text-corporate-green transition duration-300">Productos</a></li>
+
+                </ul>
+            </div>
+            <div id="contact-info">
+                <h4 class="text-lg font-semibold mb-4 border-b border-corporate-green pb-2" href="#contact-info">Contacto</h4>
+                <p class="text-sm text-gray-400">
+                    📍 Av. Santa Lucía, 62, 41500 Alcalá de Guadaíra, Sevilla
+                    <span class="block mt-2">📞Tel: <a href="tel:+34123456789" class="hover:text-corporate-green">+34 691 355 682</a></span>
+                    <span class="block">✉️Email: <a href="mailto:info@natursur.com" class="hover:text-corporate-green">info@natursur.com</a></span>
+                </p>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4 border-b border-corporate-green pb-2">Síguenos</h4>
+                <div class="flex space-x-4">
+                    <!-- Facebook -->
+                    <a href="https://www.facebook.com/natursur" target="_blank" class="text-gray-400 hover:text-corporate-green transition duration-300">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.24 12c0-5.52-4.48-10-10-10S2.24 6.48 2.24 12c0 4.93 3.63 9.07 8.35 9.8v-7H8.38v-2.8h2.21v-2.14c0-2.18 1.33-3.37 3.27-3.37 0.93 0 1.73 0.07 1.96 0.1v2.23h-1.32c-1.03 0-1.24 0.49-1.24 1.21V12h2.5L16.5 14.8h-2.1v7c4.72-0.73 8.35-4.87 8.35-9.8z"/></svg>
+                    </a>
+                    <!-- Youtube -->
+                    <a href="https://www.youtube.com/@natursur" target="_blank" class="text-gray-400 hover:text-corporate-green transition duration-300">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zm11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+                    </a>
+                    <!-- Instagram -->
+                    <a href="https://www.instagram.com/yosoyescalona/" target="_blank" class="text-gray-400 hover:text-corporate-green transition duration-300">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 border-t border-gray-700 mt-8 pt-4 text-center">
+            <p class="text-xs text-gray-500">&copy; 2025 Natursur. Desarrollado para PGPI-G1-6. | <a href="#" class="hover:text-white">Aviso Legal</a></p>
+        </div>
+    </footer>
+
+    <!-- JS para la funcionalidad del Menú Móvil -->
+    <script>
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
+
+    <!-- Botón WhatsApp Simple -->
+    <a href="https://wa.me/34691355682?text=Hola,%20me%20gustaría%20saber%20más%20sobre%20sus%20servicios" 
+    target="_blank"
+    class="fixed bottom-6 left-6 z-50 w-14 h-14 bg-[#25D366] hover:bg-[#128C7E] rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110">
+    
+        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893c0-3.189-1.248-6.189-3.515-8.444"/>
+        </svg>
+    </a>
+
+
+    <!-- Modal Login Flotante -->
+    <div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-95 opacity-0"
+             id="modalContent">
+            
+            <!-- Header del Modal -->
+            <div class="bg-[#126853] text-white p-6 rounded-t-2xl">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold">Iniciar Sesión</h3>
+                    <button type="button" class="text-white hover:text-gray-200 text-2xl" onclick="closeLoginModal()">
+                        &times;
+                    </button>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <form method="post" action="{% url 'login' %}" class="p-6 space-y-4">
+                {% csrf_token %}
+                
+                <!-- Campo Usuario -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                        Usuario o Email
+                    </label>
+                    <input type="text" 
+                           id="username" 
+                           name="username" 
+                           required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-button-turquesa focus:border-transparent transition duration-200"
+                           placeholder="Tu usuario o email">
+                </div>
+
+                <!-- Campo Contraseña -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                        Contraseña
+                    </label>
+                    <input type="password" 
+                           id="password" 
+                           name="password" 
+                           required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-button-turquesa focus:border-transparent transition duration-200"
+                           placeholder="Tu contraseña">
+                </div>
+
+                <!-- Recordarme + Olvidé contraseña -->
+                <div class="flex justify-between items-center">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="rounded text-button-turquesa focus:ring-button-turquesa">
+                        <span class="ml-2 text-sm text-gray-600">Recordarme</span>
+                    </label>
+                    <a href="#" class="text-sm text-button-turquesa hover:underline">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+
+                <!-- Botón Enviar -->
+                <button type="submit"
+                        class="w-full bg-button-turquesa text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition duration-200">
+                    Iniciar Sesión
+                </button>
+            </form>
+
+            <!-- Registrarse -->
+            <div class="px-6 pb-6 border-t border-gray-100 pt-4">
+                <p class="text-center text-gray-600">
+                    ¿No tienes cuenta?
+                    <a href="#" class="text-button-turquesa font-semibold hover:underline" data-open-register>
+                        Regístrate aquí
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Registro Flotante -->
+    <div id="registerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-95 opacity-0"
+             id="registerModalContent">
+            
+            <!-- Header del Modal -->
+            <div class="bg-[#126853] text-white p-6 rounded-t-2xl">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold">Crear Cuenta</h3>
+                    <button type="button" class="text-white hover:text-gray-200 text-2xl" onclick="closeRegisterModal()">
+                        &times;
+                    </button>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <form method="post" action="{% url 'registro' %}" class="p-6 space-y-4">
+                {% csrf_token %}
+                
+                <!-- Campo Usuario -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                        Usuario
+                    </label>
+                    <input type="text"
+                           id="register_username"
+                           name="username"
+                           required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-button-turquesa focus:border-transparent transition duration-200"
+                           placeholder="Elige un nombre de usuario">
+                </div>
+
+                <!-- Campo Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                        Email
+                    </label>
+                    <input type="email" 
+                           id="register_email" 
+                           name="email" 
+                           required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-button-turquesa focus:border-transparent transition duration-200"
+                           placeholder="tu@email.com">
+                </div>
+
+                <!-- Campo Contraseña -->
+                <div>
+                    <label for="password1" class="block text-sm font-medium text-gray-700 mb-2">
+                        Contraseña
+                    </label>
+                    <input type="password" 
+                           id="register_password1" 
+                           name="password1" 
+                           required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-button-turquesa focus:border-transparent transition duration-200"
+                           placeholder="Crea una contraseña segura">
+                </div>
+
+                <!-- Confirmar Contraseña -->
+                <div>
+                    <label for="password2" class="block text-sm font-medium text-gray-700 mb-2">
+                        Confirmar Contraseña
+                    </label>
+                    <input type="password" 
+                           id="register_password2" 
+                           name="password2" 
+                           required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-button-turquesa focus:border-transparent transition duration-200"
+                           placeholder="Repite tu contraseña">
+                </div>
+
+                <!-- Términos y condiciones -->
+                <div class="flex items-center">
+                    <input type="checkbox" id="terms" required class="rounded text-button-turquesa focus:ring-button-turquesa">
+                    <label for="terms" class="ml-2 text-sm text-gray-600">
+                        Acepto los <a href="#" class="text-button-turquesa hover:underline">términos y condiciones</a>
+                    </label>
+                </div>
+
+                <!-- Botón Enviar -->
+                <button type="submit"
+                        class="w-full bg-button-turquesa text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition duration-200">
+                    Crear Cuenta
+                </button>
+            </form>
+
+            <!-- Iniciar Sesión -->
+            <div class="px-6 pb-6 border-t border-gray-100 pt-4">
+                <p class="text-center text-gray-600">
+                    ¿Ya tienes cuenta?
+                    <a href="#" class="text-button-turquesa font-semibold hover:underline" data-open-login>
+                        Inicia sesión aquí
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // JavaScript para el Modal Login
+        function openLoginModal() {
+            const modal = document.getElementById('loginModal');
+            const content = document.getElementById('modalContent');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        // JavaScript para el Modal Register
+        function openRegisterModal() {
+            const modal = document.getElementById('registerModal');
+            const content = document.getElementById('registerModalContent');
+            
+            // Primero cerrar el modal de login si está abierto
+            closeLoginModal();
+            
+            // Abrir el modal de registro
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeLoginModal() {
+            const modal = document.getElementById('loginModal');
+            const content = document.getElementById('modalContent');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function closeRegisterModal() {
+            const modal = document.getElementById('registerModal');
+            const content = document.getElementById('registerModalContent');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+
+        // Funciones de JavaScript para abrir y cerrar el Modal
+        function openModal() {
+            // 1. Ocultar el botón original (para que no se vea detrás del modal)
+            const modal = document.getElementById('promocion-modal');
+            const content = document.getElementById('promocion-modal-content');
+            const addButton = document.getElementById('add-message-btn');
+            if (addButton) {
+                // Ocultar el botón al hacer clic
+                addButton.style.display = 'none';
+            }
+    
+            // 2. Mostrar el modal flotante
+            modal.classList.remove('hidden');
+
+            // Aplicar transición suave
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('promocion-modal');
+            const content = document.getElementById('promocion-modal-content');
+            const addButton = document.getElementById('add-message-btn');
+            
+            // Iniciar transición de cierre
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            // Ocultar el fondo y restaurar el botón después de la transición (300ms)
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (addButton) {
+                    addButton.style.display = 'inline-block'; 
+                }
+            }, 300);
+        }
+
+        // Opcional: Cerrar modal haciendo clic fuera
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('promocion-modal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeModal();
+                    }
+                });
+            }
+        });
+
+
+
+        // Cuando la página carga
+        document.addEventListener('DOMContentLoaded', function() {
+            // Abrir Modal Login
+            document.querySelectorAll('[data-open-login]').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openLoginModal();
+                });
+            });
+
+            // Abrir Modal Registro
+            document.querySelectorAll('[data-open-register]').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openRegisterModal();
+                });
+            });
+
+            // Cerrar modales al hacer clic fuera del contenido
+            document.getElementById('loginModal').addEventListener('click', function(e) {
+                if (e.target === this) closeLoginModal();
+            });
+            
+            document.getElementById('registerModal').addEventListener('click', function(e) {
+                if (e.target === this) closeRegisterModal();
+            });
+        });
+
+
+        // JavaScript para el botón de contacto en el footer
+        document.addEventListener('DOMContentLoaded', () => {
+            const contactoLinks = document.querySelectorAll('a[href="#contact-info"]');
+            const contactoSection = document.getElementById('contact-info');
+
+            if (contactoSection) {
+                contactoLinks.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    contactoSection.scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+
+        // JavaScript para el botón de contacto en el footer - MÓVIL
+        document.querySelectorAll('a[href="#contact-info"]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                contactoSection.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+});
+    </script>
+
+    <script>
+    // Auto-cierre simple de mensajes después de 3 segundos
+    setTimeout(() => {
+        document.querySelectorAll('[role="alert"]').forEach(msg => {
+            msg.style.opacity = '0';
+            setTimeout(() => msg.remove(), 500);
+        });
+    }, 2000);
+    </script>
+
+    <!-- CHAT BOT -->
+    <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js" defer></script>
+    <script src="https://files.bpcontent.cloud/2025/11/21/12/20251121124058-IH384VBE.js" defer></script>
+
+    <!-- JavaScript para la gestión del mensaje administrativo -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('admin-message-container');
+        const addButton = document.getElementById('add-message-btn');
+        const deleteButton = document.getElementById('delete-message-btn');
+        const inputArea = document.getElementById('message-input-area');
+        const saveButton = document.getElementById('save-message-btn');
+        const cancelButton = document.getElementById('cancel-input-btn');
+        const messageText = document.getElementById('message-text');
+        const messageUrl = document.getElementById('message-url');
+
+        // Función para obtener el token CSRF de Django
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // --- EVENTOS DEL FRONTEND ---
+
+        // 1. Mostrar el área de inputs al hacer clic en 'Añadir Mensaje'
+        if (addButton) {
+            addButton.addEventListener('click', function() {
+                addButton.style.display = 'none';
+                inputArea.style.display = 'block';
+            });
+        }
+
+        // 2. Cancelar la entrada de mensaje
+        if (cancelButton) {
+            cancelButton.addEventListener('click', function() {
+                messageText.value = '';
+                messageUrl.value = '';
+                inputArea.style.display = 'none';
+                if (addButton) addButton.style.display = 'inline-block';
+            });
+        }
+
+        // --- LÓGICA DE GUARDADO (AJAX) ---
+        if (saveButton) {
+            saveButton.addEventListener('click', function() {
+                const text = messageText.value;
+                const url = messageUrl.value;
+
+                if (!text) {
+                    alert('El mensaje no puede estar vacío.');
+                    return;
+                }
+
+                fetch('{% url "update_Directo" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({ text: text, url: url })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Reemplaza el contenido del contenedor con el mensaje y el botón de eliminar
+                        container.innerHTML = `
+                            <span id="current-message-display">${data.message_html}</span>
+                            <button id="delete-message-btn" class="btn btn-sm btn-danger ml-2" title="Eliminar mensaje">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        `;
+                        // Vuelve a adjuntar el event listener al nuevo botón de eliminar
+                        document.getElementById('delete-message-btn').addEventListener('click', handleDelete);
+                    } else {
+                        alert('Error al guardar: ' + data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+
+        // --- LÓGICA DE ELIMINACIÓN (AJAX) ---
+        function handleDelete() {
+            fetch('{% url "delete_Directo" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Vuelve al estado inicial del botón de añadir
+                    container.innerHTML = `
+                        <button id="add-message-btn" class="btn btn-sm btn-success">
+                            Añadir Mensaje
+                        </button>
+                        <div id="message-input-area" style="display: none;">...</div>
+                    `;
+                    // Para que la funcionalidad siga viva sin recarga, tendrías que re-inicializar
+                    // el DOM (o recargar la página), pero por simplicidad de este ejemplo,
+                    // la recarga o re-inicialización de listeners es necesaria.
+                    window.location.reload(); // La forma más simple
+                } else {
+                    alert('Error al eliminar el mensaje.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        if (deleteButton) {
+            deleteButton.addEventListener('click', handleDelete);
+        }
+    });
+    </script>
+</body>
+</html>
