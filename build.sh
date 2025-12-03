@@ -5,16 +5,8 @@ pip install -r requirements.txt
 cd natursur
 python manage.py collectstatic --no-input
 
-# Core Django primero
-python manage.py migrate auth --noinput
-python manage.py migrate contenttypes --noinput
-python manage.py migrate admin --noinput
-python manage.py migrate sessions --noinput
-
-# Resetear home completamente
-python manage.py migrate home zero --noinput 2>/dev/null || true
-python manage.py makemigrations home --noinput 2>/dev/null || true
+# 1. MIGRAR home PRIMERO (crea home_user)
 python manage.py migrate home --noinput
 
-# Final
+# 2. LUEGO migrar todo lo demás
 python manage.py migrate --noinput
