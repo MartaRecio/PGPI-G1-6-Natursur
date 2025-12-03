@@ -1,18 +1,13 @@
-#!/usr/bin/env bash
 set -o errexit
 
-pip install -r requirements.txt
+# Install dependencies
+pip install -r natursur/requirements.txt
 
-# First navigate to Django project folder
-cd natursur
+# Navigate to Django project
+cd /natursur
 
+# Static files
 python manage.py collectstatic --no-input
 
-# Fake all migrations first to avoid table errors
-python manage.py migrate --fake --noinput
-
-# Then apply migrations normally
+# Apply ALL migrations (Django handles everything)
 python manage.py migrate --noinput
-
-# Load initial data if exists
-python manage.py loaddata home/fixtures/initial_data.json 2>/dev/null || true
