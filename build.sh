@@ -5,8 +5,8 @@ pip install -r requirements.txt
 cd natursur
 python manage.py collectstatic --no-input
 
-# 1. MIGRAR home PRIMERO (crea home_user)
-python manage.py migrate home --noinput
+# 1. Crear migraciones para home
+python manage.py makemigrations home --noinput
 
-# 2. LUEGO migrar todo lo demás
+# 2. Aplicar TODAS las migraciones
 python manage.py migrate --noinput
