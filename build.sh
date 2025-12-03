@@ -11,6 +11,9 @@ python manage.py makemigrations home --noinput
 # 2. Aplicar TODAS las migraciones
 python manage.py migrate --noinput
 
+# Después de migrate
+python home/populateDB.py 2>/dev/null || echo "Scraping ejecutado o falló"
+
 # CARGAR DATOS después de migrar
 python manage.py loaddata home/fixtures/initial_data.json 2>/dev/null || echo "No fixture data found or already loaded"
 
