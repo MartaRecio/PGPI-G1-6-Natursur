@@ -60,20 +60,20 @@
 
     <!-- HEADER & NAVEGACIÓN -->
     <header class="shadow-sm sticky top-0 z-50 bg-white border-b border-gray-100">
-        <div class="w-full px-6 py-6 flex justify-between items-center h-32">
+        <div class="w-full px-4 sm:px-6 py-4 sm:py-6 flex justify-between items-center h-28 sm:h-32">
             
             <!-- COLUMNA 1: LOGO  -->
-            <div class="flex items-center flex-none ml-8">
+            <div class="flex items-center flex-shrink-0">
                 <a href="{% url 'home' %}" class="flex items-center">
                     <img src="{% static 'home/img/logo_natursur.png' %}"
                          alt="Natursur Logo Completo"
-                         class="h-25 w-auto">
+                         class="h-25 sm:h-25 w-auto">
                 </a>
             </div>
 
 
             <!-- COLUMNA INTERMEDIA: DIRECTO -->
-            <div id="directo-container" class="flex items-center justify-center flex-grow">
+            <div id="directo-container" class="directo-container" class="flex items-center justify-center flex-1 min-w-0 px-2">
                 {% if current_directo %}
                     
                     <!-- BOTÓN DEL ENLACE (Visible para todos) -->
@@ -109,7 +109,7 @@
             </div>
 
             <!-- COLUMNA 2: MENÚ DE NAVEGACIÓN  -->
-            <div class="flex items-center justify-end flex-none space-x-8">
+            <div class="flex items-center justify-end flex-shrink-0">
                 <nav class="hidden lg:flex justify-center items-center text-base font-semibold uppercase space-x-6">
                     <!-- Enlaces del menú principal -->
                     <a href="{% url 'home' %}" class="font-semibold text-green-800 hover:text-button-turquesa transition duration-300">Inicio</a>
@@ -170,17 +170,18 @@
 
 
                 <!-- Botón de Menú -->
-                <button id="mobile-menu-button" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition duration-300 text-corporate-green ml-4">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                <button id="mobile-menu-button" class="lg:hidden p-2 sm:p-3 rounded-lg hover:bg-opacity-90 transition duration-300 text-corporate-green ml-2 sm:ml-4">
+                    <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </div>
         </div>
-        
+
             <!-- MENÚ MÓVIL DESPLEGABLE -->
             <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-gray-200 shadow-lg w-full absolute left-0 top-full">
                 <div class="container mx-auto">
                     <a href="{% url 'home' %}" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200">INICIO</a>
                     <a href="{% url 'services' %}" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200">SERVICIOS</a>
+                    <a href="{% url 'lista_productos' %}" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200">PRODUCTOS</a>
                     <a href="#contact-info" class="block py-4 px-6 border-b hover:bg-[#00A69A] hover:text-white text-[#00A69A] transition duration-200">CONTACTO</a>
                     <!-- LOGIN EN MÓVIL -->
                     {% if user.is_authenticated %}
@@ -201,7 +202,7 @@
                 </div>
             </div>
 
-            <div id="promocion-modal" 
+            <div id="promocion-modal"
                 class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
                 
                 <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-95 opacity-0"
