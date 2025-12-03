@@ -10,7 +10,7 @@ services:
     name: natursur
     runtime: python
     buildCommand: './build.sh'
-    startCommand: 'python -m gunicorn natursur.asgi:application -k uvicorn.workers.UvicornWorker'
+    startCommand: 'cd /opt/render/project/src/natursur && gunicorn natursur.wsgi:application'
     envVars:
       - key: DATABASE_URL
         fromDatabase:
