@@ -3,6 +3,9 @@ set -o errexit
 
 pip install -r requirements.txt
 
+# First navigate to Django project folder
+cd natursur
+
 python manage.py collectstatic --no-input
 
 python manage.py migrate
