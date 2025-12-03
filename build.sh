@@ -1,7 +1,7 @@
 set -o errexit
 
 # Install dependencies
-pip install -r natursur/requirements.txt
+pip install -r requirements.txt
 
 # Navigate to Django project
 cd /natursur
