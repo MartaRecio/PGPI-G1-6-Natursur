@@ -8,4 +8,11 @@ cd natursur
 
 python manage.py collectstatic --no-input
 
-python manage.py migrate
+# Fake all migrations first to avoid table errors
+python manage.py migrate --fake --noinput
+
+# Then apply migrations normally
+python manage.py migrate --noinput
+
+# Load initial data if exists
+python manage.py loaddata home/fixtures/initial_data.json 2>/dev/null || true
