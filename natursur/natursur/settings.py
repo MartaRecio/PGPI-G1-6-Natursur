@@ -28,8 +28,8 @@ SECRET_KEY = 'django-insecure-01*q5xgo#$bo8z^-e)l*oajnkr4wxa$nc@*%3av6&xk*n=vitt
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'natursur-rxva.onrender.com',
-    'natursur.onrender.com',
+    'natursur-l078.onrender.com',
+    '.onrender.com',
     'localhost',
     '127.0.0.1',
 ]
