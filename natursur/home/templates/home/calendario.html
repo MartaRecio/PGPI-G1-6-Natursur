@@ -87,58 +87,58 @@
                 </div>
 
                 <!-- Columna Derecha - Calendario y Horas -->
-                <div class="w-full lg:w-2/5">
-                            <div class="bg-white rounded-xl p-4 md:p-6 h-full flex flex-col">
-                                <!-- Encabezado del calendario -->
-                                <div class="flex justify-between items-center mb-4 md:mb-6 px-1 md:px-2">
-                                    <button class="text-[#00A69A] hover:text-[#00857A] p-2 month-nav-btn" data-direction="prev">
-                                        <svg class="w-6 h-6 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="p-8 lg:col-span-2 flex flex-col">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-8">Selecciona fecha y hora</h2>
+
+                    <div class="flex flex-col lg:flex-row gap-4 md:gap-6 h-full">
+                        <!-- Calendario -->
+                        <div class="w-full lg:w-2/5">
+                            <div class="bg-white rounded-xl p-4 h-full flex flex-col">
+                                <div class="flex justify-between items-center mb-6 px-2">
+                                    <button class="text-[#00A69A] hover:text-[#00857A] p-1 month-nav-btn" data-direction="prev">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                                         </svg>
                                     </button>
                                     
-                                    <h4 class="text-lg md:text-xl font-bold text-gray-900" id="mini-calendar-month">{{ nombre_mes_espanol }} {{ año }}</h4>
+                                    <h4 class="text-lg font-bold text-gray-900" id="mini-calendar-month">{{ nombre_mes_espanol }} {{ año }}</h4>
                                     
-                                    <button class="text-[#00A69A] hover:text-[#00857A] p-2 month-nav-btn" data-direction="next">
-                                        <svg class="w-6 h-6 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button class="text-[#00A69A] hover:text-[#00857A] p-1 month-nav-btn" data-direction="next">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                         </svg>
                                     </button>
                                 </div>
 
-                                <!-- Días de la semana -->
-                                <div class="grid grid-cols-7 gap-1 md:gap-2 mb-3 md:mb-4">
-                                    <div class="text-center text-sm md:text-xs font-semibold text-gray-500 py-2">L</div>
-                                    <div class="text-center text-sm md:text-xs font-semibold text-gray-500 py-2">M</div>
-                                    <div class="text-center text-sm md:text-xs font-semibold text-gray-500 py-2">X</div>
-                                    <div class="text-center text-sm md:text-xs font-semibold text-gray-500 py-2">J</div>
-                                    <div class="text-center text-sm md:text-xs font-semibold text-gray-500 py-2">V</div>
-                                    <div class="text-center text-sm md:text-xs font-semibold text-gray-400 py-2">S</div>
-                                    <div class="text-center text-sm md:text-xs font-semibold text-gray-400 py-2">D</div>
+                                <div class="grid grid-cols-7 gap-1 mb-4 px-2">
+                                    <div class="text-center text-xs font-semibold text-gray-500 py-1">L</div>
+                                    <div class="text-center text-xs font-semibold text-gray-500 py-1">M</div>
+                                    <div class="text-center text-xs font-semibold text-gray-500 py-1">X</div>
+                                    <div class="text-center text-xs font-semibold text-gray-500 py-1">J</div>
+                                    <div class="text-center text-xs font-semibold text-gray-500 py-1">V</div>
+                                    <div class="text-center text-xs font-semibold text-gray-400 py-1">S</div>
+                                    <div class="text-center text-xs font-semibold text-gray-400 py-1">D</div>
                                 </div>
 
-                                <!-- Días del mes -->
-                                <div class="grid grid-cols-7 gap-1 md:gap-2 flex-1" id="mini-calendar-days"></div>
+                                <div class="grid grid-cols-7 gap-1 flex-1 px-2" id="mini-calendar-days"></div>
 
-                                <!-- Fecha seleccionada -->
                                 <div class="mt-4 pt-4 border-t border-gray-200">
                                     <div class="text-center">
                                         <div class="text-sm text-gray-600 mb-1">Fecha seleccionada</div>
-                                        <div class="font-semibold text-[#00A69A] text-base" id="selected-date-mini-display"></div>
+                                        <div class="font-semibold text-[#00A69A]" id="selected-date-mini-display"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Horas disponibles - OCUPA TODO EL ANCHO EN MÓVIL -->
-                        <div class="w-full lg:w-3/5 mt-6 lg:mt-0">
-                            <div class="bg-white rounded-xl p-4 md:p-6 h-full flex flex-col">
-                                <h3 class="text-lg md:text-xl font-bold text-gray-900 mb-4">Horarios disponibles</h3>
+                        <!-- Horas disponibles -->
+                        <div class="w-full lg:w-3/5 mt-4 md:mt-0">
+                            <div class="bg-white rounded-xl p-6 h-full flex flex-col">
+                                <h3 class="text-lg font-bold text-gray-900 mb-4">Horarios disponibles</h3>
                                 <div class="mb-4">
-                                    <div class="text-sm md:text-base text-gray-600" id="selected-date-full-display"></div>
+                                    <div class="text-sm text-gray-600" id="selected-date-full-display"></div>
                                 </div>
-                                <!-- Grid de horas - 1 columna en móvil, 2 en tablet/desktop -->
-                                <div id="hours-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 flex-1 content-start"></div>
+                                <div id="hours-container" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-3"></div>
                             </div>
                         </div>
                     </div>
@@ -183,9 +183,6 @@ document.addEventListener('DOMContentLoaded', function() {
         7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
     };
 
-    // Detectar si es dispositivo móvil
-    const isMobile = window.innerWidth < 768;
-
     function isPastDay(year, month, day) {
         const checkDate = new Date(year, month - 1, day);
         const today = new Date(currentDate.year, currentDate.month - 1, currentDate.day);
@@ -214,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const emptyDays = startingDay === 0 ? 6 : startingDay - 1;
         
         for (let i = 0; i < emptyDays; i++) {
-            daysHTML += '<div class="text-center"><div class="py-2 text-transparent text-sm md:text-xs">&nbsp;</div></div>';
+            daysHTML += '<div class="text-center"><div class="py-2 text-transparent text-xs">&nbsp;</div></div>';
         }
         
         for (let day = 1; day <= daysInMonth; day++) {
@@ -225,15 +222,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const isSelected = dateString === selectedDate;
             
             if (isPast || isWeekendDay) {
-                daysHTML += `<div class="text-center"><div class="py-2 text-gray-300 text-sm md:text-xs cursor-not-allowed">${day}</div></div>`;
+                daysHTML += `<div class="text-center"><div class="py-2 text-gray-300 text-xs cursor-not-allowed">${day}</div></div>`;
             } else {
                 const btnClass = isToday || isSelected ? 'bg-[#00A69A] text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-200';
-                // AÑADIDO: Clases responsivas para móvil
-                const paddingClass = isMobile ? 'py-3' : 'py-2 md:py-2';
-                const fontSizeClass = isMobile ? 'text-base' : 'text-sm md:text-xs';
                 daysHTML += `
                     <div class="text-center">
-                        <button type="button" class="w-full ${paddingClass} rounded-lg text-center transition duration-200 calendar-day-mini-btn ${btnClass} ${fontSizeClass}"
+                        <button type="button" class="w-full py-2 rounded text-xs transition duration-200 calendar-day-mini-btn ${btnClass}"
                                 data-date="${dateString}" data-day="${day}">${day}</button>
                     </div>
                 `;
@@ -357,10 +351,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         const hourCard = document.createElement('button');
                         
                         if (isOcupada) {
-                            // AÑADIDO: Clases responsivas para móvil
-                            const paddingClass = isMobile ? 'p-4' : 'p-3 md:p-4';
-                            const fontSizeClass = isMobile ? 'text-base' : 'text-sm md:text-base';
-
                             hourCard.className = 'bg-gray-50 text-gray-300 rounded-lg p-4 text-center border border-gray-200 flex flex-col items-center justify-center cursor-not-allowed opacity-40';
                             hourCard.disabled = true;
                             hourCard.innerHTML = `
@@ -368,13 +358,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="text-xs text-gray-400 mt-1">Ocupada</div>
                             `;
                         } else {
-                            // AÑADIDO: Clases responsivas para móvil
-                            const paddingClass = isMobile ? 'p-4' : 'p-3 md:p-4';
-                            const fontSizeClass = isMobile ? 'text-base' : 'text-sm md:text-base';
-
-                            hourCard.className = `bg-gray-50 hover:bg-[#00A69A] hover:text-white rounded-lg ${paddingClass} text-center transition duration-200 border border-gray-200 flex flex-col items-center justify-center`;
+                            hourCard.className = 'bg-gray-50 hover:bg-[#00A69A] hover:text-white rounded-lg p-4 text-center transition duration-200 border border-gray-200 flex flex-col items-center justify-center';
                             hourCard.innerHTML = `
-                                <div class="font-medium text-gray-700 ${fontSizeClass}">${hour}</div>
+                                <div class="font-medium text-gray-700 text-sm">${hour}</div>
                                 <div class="text-xs text-gray-500 mt-1">Disponible</div>
                             `;
                             
@@ -467,30 +453,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     initialize();
-    
-    window.addEventListener('resize', function() {
-        updateMiniCalendar();
-        loadAvailableHours(selectedDate);
-    });
 });
 </script>
+
 
 <style>
 .modal-hidden {
     display: none !important;
 }
+
 @media (max-width: 768px) {
     .calendar-day-mini-btn {
-        min-height: 44px;
+        min-height: 50px !important;
     }
     
     #hours-container button {
-        min-height: 60px;
-    }
-    
-    .month-nav-btn {
-        min-width: 44px;
-        min-height: 44px;
+        min-height: 70px !important;
     }
 }
 </style>
