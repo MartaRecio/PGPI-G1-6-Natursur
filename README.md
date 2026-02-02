@@ -1,5 +1,4 @@
 # Natursur - Proyecto Django PGPI
-https://natursur-l078.onrender.com
 
 Proyecto web para Natursur desarrollado en Django
 
